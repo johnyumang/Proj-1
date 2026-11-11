@@ -65,6 +65,23 @@ Natural, realistic adult body proportions. Hands relaxed with five fingers each.
 No jewellery, no tattoos, no logos, no text, no props, no other people.
 ```
 
+### Shadow lighting (use instead of the style block for the stage plates on the dark page)
+
+Sheets 1 to 3 stay evenly lit, because they are references. The stage plates in Sheet 4 are the ones that appear on the dark page, and they use this block.
+
+```
+Low-key studio photograph, full-frame camera, 85 mm lens, f/4, eye-level, on a near-black seamless backdrop.
+One large soft key light from high on the camera-left side at about 45 degrees, falling off quickly so the far side of the body goes into deep shadow. No fill light.
+A narrow warm rim light from behind on the shadow side traces the hair, shoulder, arm and hip, so the figure never merges with the background.
+A faint pool of light on the floor under the feet.
+Skin keeps its true depth of colour with natural texture, with soft highlights on the cheekbone, collarbone and shoulder. Shadows stay clean and dark, not grey.
+The belt stays readable in the light: its top edge, the curve of the front panel and the fabric texture are all visible.
+Natural, realistic adult body proportions. Hands relaxed with five fingers each.
+No jewellery, no tattoos, no logos, no text, no props, no other people.
+```
+
+Check each shadow-lit plate twice: once as generated, once placed on the page background. If the shadow side, dark hair or a black belt disappears into the page, the rim light is too weak; generate again.
+
 ## 4. Sheets
 
 ### Sheet 1 — Turnaround (creates the person)
@@ -96,7 +113,7 @@ Wardrobe (men): open white linen shirt, off-white trousers worn low on the hips 
 
 ### Sheet 4 — Stage plates for the scroll page (attach Sheet 1, the approved Sheet 3 and the real belt photos)
 
-One image per line. Portrait 4:5, full body with space above the head and below the feet, same backdrop and lighting as the style block so the figure can be cut out cleanly.
+One image per line. Portrait 4:5, full body with space above the head and below the feet. Use the shadow-lighting block above; the rim light is what lets the figure be cut out cleanly.
 
 | File | Colour | Pose |
 |---|---|---|
