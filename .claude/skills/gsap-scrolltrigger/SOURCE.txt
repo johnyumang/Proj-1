@@ -1,0 +1,1 @@
+Copied unmodified from https://github.com/freshtechbro/claudedesignskills (commit 1da73fe), MIT License. See LICENSE in this folder.
