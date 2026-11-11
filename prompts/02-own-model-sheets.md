@@ -12,7 +12,7 @@ The same shot list works as a brief for a real photo shoot with real Filipino mo
 3. **The belt is never invented.** Any image that shows the belt is generated with the real product photos attached, and is checked against them (section 6) before use.
 4. **Close-ups of the product are real photographs.** The access opening, the zip, the label and the fabric are photographed, not generated.
 5. **No pouch, stoma, scar or medical setting** in generated images. The belt lies flat with a slight soft fullness on one side of the front panel.
-6. **Skin stays as described.** No lightening, no smoothing to plastic, no narrowing of features. Reject any result that drifts paler than the target.
+6. **Skin stays as described.** No lightening, no smoothing to plastic, no narrowing of features. Reject any result that drifts paler than the target. The first test of the dark-skinned woman came back medium brown (kayumanggi), so the dark-skin wording below is deliberately strong; if a result is still too light, generate again rather than accept it.
 
 ## 2. Cast
 
@@ -30,7 +30,7 @@ Expression: calm and warm, a small closed-mouth smile.
 **Amihan — dark-skinned woman**
 ```
 Amihan is a 52-year-old Filipino woman, 157 cm tall, fuller build with a rounded midsection and strong arms (wears a size XL).
-Skin: deep brown with a warm red-brown undertone, around Monk Skin Tone 8. Natural texture, fine lines at the eyes, no retouching.
+Skin: dark — a deep, rich espresso brown with a warm red-brown undertone, clearly darker than a medium-brown complexion, around Monk Skin Tone 8. Natural texture, fine lines at the eyes, no retouching.
 Face: round, soft features, low nose bridge, full lips, dark brown eyes, laugh lines.
 Hair: black with silver strands at the temples, wavy, tied in a low bun.
 Expression: open and confident, an easy smile.
@@ -48,7 +48,7 @@ Expression: relaxed, friendly, a half smile.
 **Danilo — dark-skinned man**
 ```
 Danilo is a 29-year-old Filipino man, 173 cm tall, lean athletic build (wears a size M).
-Skin: deep brown with a warm undertone, around Monk Skin Tone 7 to 8, sun-deepened on the shoulders. Natural texture.
+Skin: dark — a deep, rich espresso brown with a warm undertone, clearly darker than a medium-brown complexion, around Monk Skin Tone 8, sun-deepened on the shoulders. Natural texture.
 Face: angular cheekbones, soft rounded nose, full lips, dark brown eyes, a small scar through the right eyebrow.
 Hair: black, short curls, neatly trimmed sides, clean shaven.
 Expression: quiet confidence, eyes to camera.
@@ -87,7 +87,7 @@ Same face shape, skin tone, hairline and identifying mark in every frame.
 ### Sheet 3 — Belt fit, one sheet per colour (attach Sheet 1 and the real belt photos in section 5)
 ```
 The same person as in the attached reference sheet, now wearing the SIIL Ostomy Belt shown in the attached product photos. Match the product photos exactly; do not redesign it.
-The belt: a wide, smooth, matte stretch-fabric band around the waist with its top edge at the navel. The front carries a deeper rounded panel whose lower edge curves down below the waistband. A narrow binding runs along the top edge and a small woven label sits on the upper front. No buckles, straps or hardware. Colour: [BEIGE warm sand | NAVY BLUE | BLACK].
+The belt: a wide, smooth, matte stretch-fabric band around the waist with its top edge at the navel. The front carries a deeper rounded panel whose lower edge curves down below the waistband. A narrow binding runs along the top edge and a small woven label sits on the upper front. The band closes with VELCRO® at its end and the pocket has a zip along its lower part; show these only as they appear in the product photos. No buckles, straps or other hardware. Colour: [BEIGE warm sand | NAVY BLUE | BLACK].
 The belt lies flat against the body with a slight soft fullness on one side of the front panel.
 Four full-body views in a row: front, three-quarter, side profile, back.
 Wardrobe (women): bone-white crop tank, light-wash jeans worn low on the hips with the top button open so the whole belt is visible.
