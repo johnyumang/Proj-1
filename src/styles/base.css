@@ -1,0 +1,464 @@
+/* Reset, page defaults and the small components shared by the story and the light sections. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--nav-h) + 1.5rem);
+  overflow-x: clip;
+  background: var(--ink);
+}
+
+body {
+  margin: 0;
+  overflow-x: clip;
+  background: var(--ink);
+  color: var(--ivory);
+  font: 400 var(--fs-body) / 1.55 var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+p,
+ul,
+ol,
+dl,
+dd,
+figure,
+blockquote {
+  margin: 0;
+}
+
+ul,
+ol {
+  padding: 0;
+  list-style: none;
+}
+
+img,
+svg,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+/* Focus is always visible. --focus is ivory on the stage and ink on the light sections. */
+:focus-visible {
+  outline: 3px solid var(--focus, var(--ivory));
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  padding: 0.7rem 1.1rem;
+  border-radius: 999px;
+  background: var(--ivory);
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-250%);
+}
+
+.skip:focus {
+  transform: none;
+  outline: 3px solid var(--bronze);
+  outline-offset: 3px;
+}
+
+/* ---------- Type ---------- */
+
+.eyebrow {
+  font: italic 500 clamp(1.25rem, 1.1rem + 0.5vw, 1.625rem) / 1.15 var(--font-serif);
+  letter-spacing: 0.005em;
+  color: var(--accent);
+}
+
+.headline {
+  font: 800 var(--fs-headline) / 0.98 var(--font-display);
+  letter-spacing: -0.02em;
+  max-width: 13ch; /* about 14 characters of this face per line */
+  text-wrap: balance;
+}
+
+.headline--serif {
+  font: italic 600 clamp(2.4rem, 4.9vw, 5.25rem) / 1 var(--font-serif);
+  letter-spacing: -0.012em;
+  max-width: 15ch;
+}
+
+.body {
+  max-width: 44ch;
+  color: var(--stage-text);
+  text-wrap: pretty;
+}
+
+.body--small,
+.note {
+  font-size: var(--fs-small);
+  line-height: 1.5;
+}
+
+.note {
+  color: var(--stage-text);
+}
+
+.link {
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+  transition: text-decoration-color 0.2s;
+}
+
+.link:hover {
+  text-decoration-color: currentColor;
+}
+
+/* ---------- Buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.6rem 1.5rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--ink);
+  font: 600 1rem / 1.1 var(--font-body);
+  letter-spacing: 0.005em;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -12px var(--accent);
+}
+
+.btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn--small {
+  min-height: 2.75rem;
+  padding-inline: 1.15rem;
+  font-size: 0.9375rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.5rem;
+}
+
+/* ---------- Chips ---------- */
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chip {
+  padding: 0.38rem 0.8rem;
+  border: 1px solid var(--stage-line);
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+/* ---------- Counters ---------- */
+
+.counters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 2.5rem;
+}
+
+.counter {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  color: var(--ivory);
+}
+
+.counter__num {
+  font: 800 var(--fs-counter) / 0.8 var(--font-display);
+  letter-spacing: -0.045em;
+  font-variant-numeric: tabular-nums;
+}
+
+.counter__unit {
+  font: 600 clamp(1rem, 0.9rem + 0.45vw, 1.375rem) / 1.1 var(--font-body);
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+/* ---------- Lists used on the stage ---------- */
+
+.bullets {
+  display: grid;
+  gap: 0.55rem;
+  max-width: 40ch;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  color: var(--stage-text);
+}
+
+.bullets li {
+  position: relative;
+  padding-left: 1.15rem;
+}
+
+.bullets li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.specline {
+  font-size: var(--fs-small);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--stage-text);
+}
+
+.deflist {
+  display: grid;
+  border-top: 1px solid var(--stage-line);
+  max-width: 34rem;
+}
+
+.deflist__row {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr);
+  gap: 1rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--stage-line);
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
+
+.deflist dt {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.deflist dd {
+  color: var(--stage-text);
+}
+
+.lines {
+  display: grid;
+  gap: 0.2rem;
+  font-size: var(--fs-small);
+  line-height: 1.45;
+  color: var(--stage-text);
+}
+
+/* Hotspot copy in the text column: a plain list here, staged by the story script. */
+.hotspots {
+  display: grid;
+  gap: 0.45rem;
+  max-width: 44ch;
+  font-size: var(--fs-small);
+  line-height: 1.4;
+}
+
+.hotspots__label {
+  font-weight: 600;
+  color: var(--ivory);
+}
+
+.hotspots__label::after {
+  content: ' · ';
+  color: var(--accent);
+}
+
+.hotspots__text {
+  color: var(--stage-text);
+}
+
+/* ---------- Colour choice ---------- */
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.swatch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 3rem;
+  padding: 0.35rem 1rem 0.35rem 0.45rem;
+  border: 1px solid var(--stage-line);
+  border-radius: 999px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.swatch__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.swatch__dot {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--dot);
+  /* the navy and black swatches need an edge to stand off the dark stage */
+  box-shadow: inset 0 0 0 1px rgb(250 248 244 / 0.35);
+}
+
+.swatch[data-swatch='beige'] {
+  --dot: var(--belt-beige);
+}
+.swatch[data-swatch='navy'] {
+  --dot: var(--belt-navy);
+}
+.swatch[data-swatch='black'] {
+  --dot: var(--belt-black);
+}
+
+.swatch:hover {
+  border-color: rgb(250 248 244 / 0.5);
+}
+
+.swatch:has(.swatch__input:checked) {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+.swatch:has(.swatch__input:focus-visible) {
+  outline: 3px solid var(--focus, var(--ivory));
+  outline-offset: 3px;
+}
+
+.swatch__input:checked + .swatch__dot {
+  box-shadow: inset 0 0 0 1px rgb(250 248 244 / 0.35), 0 0 0 2px var(--ink), 0 0 0 4px var(--accent);
+}
+
+/* The chosen colour name inside "SIIL Ostomy Belt · {color} · pick size". */
+.color-name {
+  display: none;
+}
+.color-name[data-color-name='beige'] {
+  display: inline;
+}
+:root:has(#color-navy:checked) .color-name[data-color-name='beige'],
+:root:has(#color-black:checked) .color-name[data-color-name='beige'] {
+  display: none;
+}
+:root:has(#color-navy:checked) .color-name[data-color-name='navy'],
+:root:has(#color-black:checked) .color-name[data-color-name='black'] {
+  display: inline;
+}
+:root[data-choice='navy'] .color-name[data-color-name='beige'],
+:root[data-choice='black'] .color-name[data-color-name='beige'] {
+  display: none;
+}
+:root[data-choice='navy'] .color-name[data-color-name='navy'],
+:root[data-choice='black'] .color-name[data-color-name='black'] {
+  display: inline;
+}
+
+.buyrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+}
+
+.buyrow__label {
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: var(--stage-text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

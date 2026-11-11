@@ -1,0 +1,566 @@
+/*
+ * The pinned, scroll-driven story (html.is-story).
+ *
+ * One stage layer stays in the viewport for the whole story. Each chapter is a tall scroll
+ * section whose text is sticky; consecutive chapters overlap by one viewport so one text
+ * layer hands over to the next without a gap. Everything that moves is driven by the
+ * scripts in src/story; this file only lays things out.
+ *
+ * Layers, back to front: stage (light, giant word, model, detail) · chapter text · light
+ * sections (they slide over the stage at the end: the dark-to-light wipe) · navigation.
+ */
+
+.stage {
+  display: none;
+}
+
+.is-story {
+  --vh: 100vh;
+}
+
+@supports (height: 100svh) {
+  .is-story {
+    --vh: 100svh;
+  }
+}
+
+/* Scroll length of each chapter, in viewports. */
+.is-story .chapter--hero { --len: 1.8; }
+.is-story .chapter--fit { --len: 3.4; }
+.is-story .chapter--clothes { --len: 2.8; }
+.is-story .chapter--access { --len: 4.2; }
+.is-story .chapter--pool { --len: 2.8; }
+.is-story .chapter--colors { --len: 2.6; }
+.is-story .chapter--close { --len: 3.4; } /* the last viewport is the wipe */
+
+@media (max-width: 899px) {
+  .is-story .chapter--hero { --len: 2.4; }
+  .is-story .chapter--fit { --len: 4.2; }
+  .is-story .chapter--clothes { --len: 3.2; }
+  .is-story .chapter--access { --len: 5.6; }
+  .is-story .chapter--pool { --len: 3.2; }
+  .is-story .chapter--colors { --len: 2.8; }
+  .is-story .chapter--close { --len: 4.2; }
+}
+
+.is-story .stage {
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: 0;
+  height: var(--vh);
+  overflow: hidden;
+  background: var(--ink);
+  contain: layout paint style;
+  pointer-events: none;
+  user-select: none;
+}
+
+.is-story .chapters {
+  position: relative;
+  z-index: 1;
+  margin-top: calc(-1 * var(--vh));
+}
+
+.is-story .chapter {
+  height: calc(var(--len) * var(--vh));
+}
+
+.is-story .chapter + .chapter {
+  margin-top: calc(-1 * var(--vh));
+}
+
+.is-story .chapter__pin,
+.is-story .chapter--hero .chapter__pin {
+  position: sticky;
+  top: 0;
+  display: block;
+  height: var(--vh);
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  pointer-events: none;
+}
+
+/* The still images stay in the document as the text alternative of the stage. */
+.is-story .chapter__figures {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+}
+
+.is-story .figure__word {
+  display: none;
+}
+
+/* The light sections rise over the pinned stage during the last viewport of the story. */
+.is-story .light {
+  margin-top: calc(-1 * var(--vh));
+}
+
+/* Nothing of the story is shown before the script has laid it out. */
+.is-story:not(.story-ready) .chapter__text,
+.is-story.is-intro .nav {
+  visibility: hidden;
+}
+
+/* ---------- Chapter text ---------- */
+
+.is-story .panel {
+  pointer-events: none;
+}
+
+.is-story .counters {
+  display: grid;
+}
+
+.is-story .counters .counter {
+  grid-area: 1 / 1;
+}
+
+.is-story .line {
+  position: relative;
+  display: block;
+}
+
+.is-story .line__sharp {
+  display: block;
+}
+
+/* A fixed, pre-blurred copy of each headline line. Only its opacity is animated, so the
+   "out of a blur" entrance costs no filter animation. */
+.is-story .line__blur {
+  position: absolute;
+  inset: 0;
+  display: block;
+  filter: blur(0.13em);
+  opacity: 0;
+  will-change: opacity;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Hotspot copy: items that have a position on the current image are shown on the stage and
+   only kept here for assistive technology; the others stay in the text column as chips. */
+.is-story .hotspots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.is-story .hotspots__item {
+  padding: 0.5rem 0.85rem;
+  border: 1px solid var(--stage-line);
+  border-radius: 1rem;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+}
+
+.is-story .hotspots__item.is-staged {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.is-story .hotspots:not(:has(.hotspots__item:not(.is-staged))) {
+  display: contents;
+}
+
+@media (min-width: 900px) {
+  .is-story .chapter__text {
+    position: absolute;
+    inset: var(--nav-h) 0 0 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.1rem;
+    max-width: none;
+    padding: 0 var(--gutter) clamp(1rem, 4vh, 3rem);
+  }
+
+  .is-story .panel {
+    width: min(36vw, 31rem);
+    gap: 1.1rem;
+  }
+
+  .is-story [data-layout='right'] .chapter__text {
+    align-items: flex-end;
+  }
+
+  /* Type follows the viewport height as well, so a chapter always fits its pin. */
+  .is-story .headline {
+    font-size: clamp(2rem, min(4.2vw, 7.4vh), 4.5rem);
+  }
+
+  .is-story .headline--serif {
+    font-size: clamp(2.4rem, min(4.9vw, 8.4vh), 5.25rem);
+  }
+
+  .is-story .counter__num {
+    font-size: clamp(5rem, min(13vw, 21vh), 13rem);
+  }
+
+  .is-story .body {
+    font-size: clamp(0.9375rem, min(0.94rem + 0.22vw, 2.1vh), 1.125rem);
+  }
+
+  /* Hero: copy bottom left, spec line bottom right. */
+  .is-story [data-layout='hero'] .chapter__text {
+    display: grid;
+    grid-template-columns: minmax(0, 27rem) minmax(0, 1fr) minmax(0, 17rem);
+    grid-template-rows: minmax(0, 1fr) auto auto auto;
+    grid-template-areas:
+      '. . .'
+      'lead . .'
+      'bullets . .'
+      'actions . spec';
+    gap: 1.15rem 2rem;
+    align-items: end;
+    padding-bottom: clamp(1.5rem, 5.5vh, 3.75rem);
+  }
+
+  .is-story .chapter--hero .panel {
+    display: contents;
+  }
+
+  .is-story .g--lead {
+    grid-area: lead;
+  }
+  .is-story .g--bullets {
+    grid-area: bullets;
+  }
+  .is-story .g--actions {
+    grid-area: actions;
+  }
+  .is-story .g--spec {
+    grid-area: spec;
+    text-align: right;
+  }
+
+  /* Close mirrors the hero: headline bottom left, counter and buy button bottom right. */
+  .is-story [data-layout='close'] .chapter__text {
+    display: grid;
+    grid-template-columns: minmax(0, min(27vw, 30rem)) minmax(0, 1fr) minmax(0, min(26vw, 24rem));
+    grid-template-rows: minmax(0, 1fr);
+    align-items: end;
+    padding-bottom: clamp(1.5rem, 5.5vh, 3.75rem);
+  }
+
+  .is-story [data-layout='close'] .panel {
+    width: auto;
+  }
+
+  .is-story [data-layout='close'] .panel[data-panel='a'] {
+    grid-column: 1;
+  }
+
+  .is-story [data-layout='close'] .panel[data-panel='b'] {
+    grid-column: 3;
+  }
+}
+
+@media (max-width: 899px) {
+  /* Small screens: the model sits in the upper half, the panels of a chapter take turns in
+     the lower half, above the sticky buy bar. */
+  .is-story .chapter__text {
+    position: absolute;
+    inset: 0;
+    display: block;
+    max-width: none;
+  }
+
+  .is-story .panel,
+  .is-story .chapter--hero .panel {
+    position: absolute;
+    left: var(--gutter);
+    right: var(--gutter);
+    bottom: calc(var(--bar-h) + 1.1rem + env(safe-area-inset-bottom, 0px));
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    max-width: 36rem;
+  }
+
+  .is-story .chapter--hero .panel {
+    bottom: calc(1.4rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .is-story .g {
+    order: 0;
+    gap: 0.65rem;
+  }
+
+  .is-story .body {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  .is-story .bullets {
+    font-size: 0.875rem;
+    gap: 0.4rem;
+  }
+
+  .is-story .headline--serif {
+    font-size: 2.3rem;
+  }
+
+  .is-story .deflist__row {
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+    padding: 0.55rem 0;
+    font-size: 0.875rem;
+  }
+
+  .is-story .hotspots__text,
+  .is-story .buyrow {
+    display: none;
+  }
+
+  .is-story .hotspots__label::after {
+    content: none;
+  }
+
+  .is-story .hotspots__item {
+    padding: 0.38rem 0.8rem;
+    border-radius: 999px;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+}
+
+/* ---------- Stage ---------- */
+
+.stage__ambient {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(110% 62% at 50% 104%, color-mix(in srgb, var(--accent) 17%, transparent), transparent 70%);
+}
+
+/* The giant word. Each letter carries its slice of one horizontal gradient (measured by the
+   script), so letters can be revealed one by one without breaking the fill. */
+.stage__word {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--nav-h) + 2vh - 0.15em);
+  display: flex;
+  margin: 0;
+  transform: translateX(-50%);
+  font: 900 var(--fs-word) / 1 var(--font-display);
+  white-space: nowrap;
+  will-change: opacity;
+}
+
+.stage__letter {
+  display: block;
+  margin-right: -0.04em;
+  background-image: linear-gradient(90deg, var(--ink-2), var(--accent));
+  background-repeat: no-repeat;
+  background-size: var(--word-w, 100%) 100%;
+  background-position: calc(-1 * var(--letter-x, 0px)) 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.stage__letter:last-child {
+  margin-right: 0;
+}
+
+.stage__rig {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 50% 50%;
+}
+
+.rig__inner {
+  position: absolute;
+  inset: 0;
+}
+
+/* Floor light: a soft ellipse under the model, in the accent, 35–55% strong. */
+.rig__floor {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 230%;
+  height: 36%;
+  transform: translate(-50%, -58%);
+  background: radial-gradient(closest-side, var(--accent), color-mix(in srgb, var(--accent) 52%, transparent) 38%, color-mix(in srgb, var(--accent) 14%, transparent) 70%, transparent);
+  opacity: var(--floor, 0.45);
+}
+
+/* Soft rim behind the figure, so dark belts and deep skin tones keep their edge on the stage. */
+.rig__rim {
+  position: absolute;
+  inset: -16% -38%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 46%, transparent), color-mix(in srgb, var(--accent) 12%, transparent) 60%, transparent);
+  opacity: var(--rim, 0.3);
+}
+
+.rig__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.rig__layer {
+  position: absolute;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.rig__layer .plate,
+.rig__layer .cutout {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+}
+
+.rig__layer .plate {
+  padding: clamp(4px, 0.45vw, 8px);
+}
+
+/* Hotspots live in the image's own coordinates and travel with it. */
+.rig__hotspots {
+  position: absolute;
+}
+
+.hotspot {
+  position: absolute;
+  left: calc(var(--x) * 100%);
+  top: calc(var(--y) * 100%);
+  width: 0;
+  height: 0;
+  opacity: 0;
+  visibility: hidden;
+  color: var(--ivory);
+}
+
+.hotspot__dot {
+  position: absolute;
+  left: -6px;
+  top: -6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--ivory);
+  box-shadow: 0 0 0 2px rgb(15 15 15 / 0.85), 0 0 0 9px rgb(250 248 244 / 0.28);
+}
+
+.hotspot__line {
+  position: absolute;
+  top: -0.5px;
+  left: 12px;
+  width: var(--reach, 4rem);
+  height: 1px;
+  background: var(--ivory);
+  box-shadow: 0 0 0 0.5px rgb(15 15 15 / 0.55);
+  transform-origin: 0 50%;
+}
+
+.hotspot[data-side='left'] .hotspot__line {
+  left: auto;
+  right: 12px;
+  transform-origin: 100% 50%;
+}
+
+.hotspot__note {
+  position: absolute;
+  top: -0.62rem;
+  left: calc(var(--reach, 4rem) + 1.5rem);
+  width: max-content;
+  max-width: 12.5rem;
+  font-size: 0.8125rem;
+  line-height: 1.38;
+}
+
+.hotspot[data-side='left'] .hotspot__note {
+  left: auto;
+  right: calc(var(--reach, 4rem) + 1.5rem);
+  text-align: right;
+}
+
+.hotspot__label {
+  display: block;
+  font: 600 0.75rem / 1.5 var(--font-body);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.hotspot__text {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--stage-text);
+}
+
+@media (max-width: 1199px) {
+  .hotspot__text {
+    display: none;
+  }
+
+  .hotspot__note {
+    max-width: 8.5rem;
+  }
+}
+
+@media (max-width: 899px) {
+  .hotspot__label {
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+  }
+
+  .hotspot__note {
+    left: calc(var(--reach, 4rem) + 1.1rem);
+  }
+
+  .hotspot[data-side='left'] .hotspot__note {
+    right: calc(var(--reach, 4rem) + 1.1rem);
+  }
+}
+
+/* Chapter 4: the close view that floats free beside the text. */
+.stage__detail {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: hidden;
+  border: 1px solid rgb(250 248 244 / 0.3);
+  border-radius: 4px;
+  background: var(--ink-2);
+  box-shadow: 0 2.5rem 5rem -1.5rem rgb(0 0 0 / 0.85);
+  opacity: 0;
+  visibility: hidden;
+  transform-origin: 50% 50%;
+}
+
+.stage__detail img {
+  position: absolute;
+  max-width: none;
+}
+
+.stage__detail .plate__file {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  text-align: center;
+}
+
+@media (max-width: 899px) {
+  .stage__word {
+    top: calc(var(--nav-h) + 0.35rem - 0.15em);
+  }
+}

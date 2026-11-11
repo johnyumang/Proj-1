@@ -1,0 +1,117 @@
+/* Quiet footer on the paper tone. */
+
+.footer {
+  position: relative;
+  z-index: 2;
+  background: var(--paper);
+  color: var(--ink);
+  --focus: var(--ink);
+  font-size: var(--fs-small);
+}
+
+.footer__strip {
+  padding: 1rem var(--gutter);
+  border-top: 1px solid var(--light-line);
+  border-bottom: 1px solid var(--light-line);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+.footer__inner {
+  display: grid;
+  gap: 2.5rem;
+  max-width: 88rem;
+  margin-inline: auto;
+  padding: clamp(2.5rem, 6vw, 4.5rem) var(--gutter);
+}
+
+.footer__brand {
+  display: grid;
+  gap: 1.25rem;
+  align-content: start;
+}
+
+.footer__logo {
+  width: 8.5rem;
+  margin-left: -1rem; /* the PNG has built-in padding; this lines its mark up with the text */
+}
+
+.footer__contact {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.footer__contact-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: var(--muted);
+}
+
+.footer__nav {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem 1.5rem;
+}
+
+.footer__title {
+  margin-bottom: 0.6rem;
+  font: 600 0.6875rem / 1.2 var(--font-body);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.footer__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  text-decoration: none;
+}
+
+.footer__link:hover {
+  text-decoration: underline;
+}
+
+.footer__base {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 2rem;
+  max-width: 88rem;
+  margin-inline: auto;
+  padding: 1.25rem var(--gutter) calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--light-line);
+  color: var(--muted);
+}
+
+.footer__legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.5rem;
+}
+
+.footer__preview {
+  margin-left: auto;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+@media (min-width: 900px) {
+  .footer__inner {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    gap: clamp(3rem, 7vw, 8rem);
+  }
+
+  .footer__nav {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 599px) {
+  .footer__preview {
+    margin-left: 0;
+    width: 100%;
+  }
+}

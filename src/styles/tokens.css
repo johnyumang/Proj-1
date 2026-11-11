@@ -1,0 +1,79 @@
+/*
+ * Design tokens. The first block is section 6 of the build prompt, unchanged, with the three
+ * belt colours filled in from the product photos. The second block is what the page needed
+ * on top of that; each addition says where it comes from.
+ */
+:root {
+  --ink: #0f0f0f; /* stage background */
+  --ink-2: #181715; /* raised surfaces on the stage */
+  --ivory: #faf8f4; /* text on the stage, background of the light sections */
+  --paper: #f3efe7; /* cards on light sections */
+  --bronze: #9a7e4f; /* default accent */
+  --muted: #6b6b6b;
+  --accent: var(--bronze); /* tweened per chapter */
+
+  /* Sampled (median of the fabric area) from the photos in public/media/belt/placeholder:
+     beige  Ostomy-BELT-WOMEN-BEIGE-SIIL-Ostomy-3-scaled.jpg   band and pocket, three areas
+     navy   Siilostomy76890-683x1024.jpg                        front panel
+     black  ostomy-belt-for-men-and-women-square.jpg            the black belt */
+  --belt-beige: #f8cda0;
+  --belt-navy: #30375b;
+  --belt-black: #2f2925;
+
+  --font-display: 'Albert Sans', 'Albert Sans Fallback', system-ui, sans-serif; /* 800–900 for the giant word, counters, headlines */
+  --font-serif: 'Cormorant Garamond', 'Cormorant Fallback', Georgia, serif; /* eyebrows and the closing headline, italic */
+  --font-body: 'Albert Sans', 'Albert Sans Fallback', system-ui, sans-serif;
+}
+
+:root {
+  /* Accents per chapter. Beige, ivory and bronze are the tokens above. The navy and black
+     belts are too dark to light a #0f0f0f stage or carry a button, so their accents are
+     lifted: the blue keeps the hue of the sampled navy (230°), the black belt gets a warm
+     neutral. The belt tokens themselves stay as sampled and are what the swatches show. */
+  --accent-beige: var(--belt-beige);
+  --accent-ivory: var(--ivory);
+  --accent-bronze: var(--bronze);
+  --accent-blue: #8b9ae4;
+  --accent-black: #d8d2c7;
+  --choice-accent: var(--accent-beige);
+
+  /* Bronze darkened until it reaches 4.5:1 on ivory and paper; used for text on light sections. */
+  --bronze-deep: #7a6238;
+
+  --stage-text: rgb(250 248 244 / 0.8); /* body text on the stage, about 11:1 on --ink */
+  --stage-line: rgb(250 248 244 / 0.2);
+  --light-line: rgb(15 15 15 / 0.14);
+
+  --fs-word: clamp(9rem, 30vw, 34rem);
+  --fs-counter: clamp(5rem, 13vw, 13rem);
+  --fs-headline: clamp(2rem, 4.2vw, 4.5rem);
+  --fs-body: clamp(1rem, 0.94rem + 0.22vw, 1.125rem);
+  --fs-small: 0.875rem;
+
+  --nav-h: 4rem;
+  --bar-h: 4rem;
+  --gutter: clamp(1.25rem, 5.5vw, 6.5rem);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (max-width: 899px) {
+  :root {
+    --nav-h: 3.5rem;
+  }
+}
+
+/* Colour choice (chapter 6). The radio group drives it without JavaScript; the scripts
+   mirror the choice in data-choice for browsers without :has(). The two selectors are
+   separate rules on purpose: an unsupported :has() would discard a combined rule. */
+:root:has(#color-navy:checked) {
+  --choice-accent: var(--accent-blue);
+}
+:root[data-choice='navy'] {
+  --choice-accent: var(--accent-blue);
+}
+:root:has(#color-black:checked) {
+  --choice-accent: var(--accent-black);
+}
+:root[data-choice='black'] {
+  --choice-accent: var(--accent-black);
+}

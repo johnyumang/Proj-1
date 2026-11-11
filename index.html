@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex,nofollow">
+    <title><!--title--></title>
+    <link rel="icon" href="data:,">
+    <!--preload-->
+    <link rel="stylesheet" href="/src/styles/index.css">
+    <script>
+      // Decide the presentation before first paint, so nothing shifts when the scripts arrive.
+      //   js        scripts run (accordion collapsed, mobile menu, sticky bar)
+      //   is-story  pinned, scroll-driven story: only without reduced motion and on viewports tall enough to hold a chapter
+      //   is-intro  hero is held back until the intro timeline starts
+      (function (d, w) {
+        var c = d.documentElement.classList;
+        c.remove('no-js');
+        c.add('js');
+        try {
+          var story = !w.matchMedia('(prefers-reduced-motion: reduce)').matches && w.matchMedia('(min-height: 560px)').matches;
+          if (story) {
+            c.add('is-story', 'is-intro');
+            // If the story script never starts (blocked, failed, far too slow), show the plain page instead.
+            w.__storyGuard = setTimeout(function () {
+              if (!w.__storyReady) {
+                w.__storyGaveUp = true;
+                c.remove('is-story', 'is-intro');
+              }
+            }, 4000);
+          }
+        } catch (e) {}
+      })(document, window);
+    </script>
+    <script type="module" src="/src/main.js"></script>
+  </head>
+  <body id="top">
+<!--app-->
+  </body>
+</html>

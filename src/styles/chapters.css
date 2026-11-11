@@ -1,0 +1,238 @@
+/*
+ * Story chapters, base presentation.
+ * This is what is shown without JavaScript, with reduced motion, or on a viewport too short
+ * to pin a chapter: seven normal sections on the dark background, each with its still image,
+ * all of its text and the final counter values. story.css turns the same markup into the
+ * pinned, scroll-driven version.
+ */
+
+.story {
+  position: relative;
+  z-index: 1;
+  background: var(--ink);
+  color: var(--ivory);
+  --focus: var(--ivory);
+}
+
+.chapter {
+  position: relative;
+  --accent: var(--accent-bronze);
+}
+
+.chapter--hero {
+  --accent: var(--accent-beige);
+}
+.chapter--fit {
+  --accent: var(--accent-ivory);
+}
+.chapter--pool {
+  --accent: var(--accent-blue);
+}
+.chapter--colors,
+.chapter--close {
+  --accent: var(--choice-accent);
+}
+
+.chapter__pin {
+  display: grid;
+  gap: clamp(2rem, 6vw, 3.5rem);
+  align-items: center;
+  max-width: 88rem;
+  margin-inline: auto;
+  padding: clamp(3.5rem, 9vw, 7.5rem) var(--gutter);
+}
+
+.chapter--hero .chapter__pin {
+  padding-top: calc(var(--nav-h) + clamp(2rem, 6vw, 4.5rem));
+}
+
+.chapter + .chapter .chapter__pin {
+  border-top: 1px solid rgb(250 248 244 / 0.08);
+}
+
+.chapter__text {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  min-width: 0;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  min-width: 0;
+}
+
+.g {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  min-width: 0;
+}
+
+/* Hero: the copy reads title, bullets, actions, spec line. The panels only group it for
+   small screens in the pinned story, so here they are flattened and reordered. */
+.chapter--hero .panel {
+  display: contents;
+}
+.g--lead {
+  order: 1;
+}
+.g--bullets {
+  order: 2;
+}
+.g--actions {
+  order: 3;
+}
+.g--spec {
+  order: 4;
+}
+
+.hero__title {
+  font: 600 0.8125rem / 1.2 var(--font-body);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--stage-text);
+}
+
+/* ---------- Still images ---------- */
+
+.chapter__figures {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-items: center;
+  min-width: 0;
+}
+
+.figure {
+  position: relative;
+  z-index: 1;
+  grid-area: 1 / 1;
+  width: min(100%, 21rem);
+}
+
+/* Pool of light on the floor under the image, in the chapter accent. */
+.figure::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  bottom: -9%;
+  width: 150%;
+  height: 26%;
+  transform: translateX(-50%);
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 50%, transparent), color-mix(in srgb, var(--accent) 16%, transparent) 55%, transparent);
+  pointer-events: none;
+}
+
+/* Placeholder photos are shown as framed plates: a hairline frame, a narrow mat, the photo. */
+.plate {
+  position: relative;
+  aspect-ratio: var(--ar, 2 / 3);
+  padding: clamp(5px, 0.5vw, 9px);
+  border: 1px solid rgb(250 248 244 / 0.3);
+  border-radius: 3px;
+  background: var(--ink-2);
+  box-shadow: 0 2.5rem 5rem -1.5rem rgb(0 0 0 / 0.85);
+}
+
+.plate img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 1px;
+}
+
+/* A photo that could not be downloaded: a neutral card with the file name, never a stand-in. */
+.plate--missing {
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  border-style: dashed;
+  text-align: center;
+}
+
+.plate__file {
+  font: 500 0.75rem / 1.4 ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  color: var(--stage-text);
+  overflow-wrap: anywhere;
+}
+
+/* Own-model stills are cut out: no frame, the figure stands on the stage. */
+.cutout {
+  aspect-ratio: var(--ar, 4 / 5);
+}
+
+.cutout img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* The giant word behind the image (hero and close). */
+.figure__word {
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  top: 2%;
+  transform: translateX(-50%);
+  font: 900 clamp(7rem, 26vw, 22rem) / 1 var(--font-display);
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+  background: linear-gradient(90deg, var(--ink-2), var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Colour choice: one still per colour, the chosen one is shown. */
+.figure[data-color='navy'],
+.figure[data-color='black'] {
+  display: none;
+}
+:root:has(#color-navy:checked) .figure[data-color='beige'],
+:root:has(#color-black:checked) .figure[data-color='beige'] {
+  display: none;
+}
+:root:has(#color-navy:checked) .figure[data-color='navy'],
+:root:has(#color-black:checked) .figure[data-color='black'] {
+  display: block;
+}
+:root[data-choice='navy'] .figure[data-color='beige'],
+:root[data-choice='black'] .figure[data-color='beige'] {
+  display: none;
+}
+:root[data-choice='navy'] .figure[data-color='navy'],
+:root[data-choice='black'] .figure[data-color='black'] {
+  display: block;
+}
+
+@media (min-width: 900px) {
+  .chapter__pin {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(3rem, 8vw, 8rem);
+  }
+
+  /* Text left, image right; "right" chapters keep the document order (image left). */
+  [data-layout='left'] .chapter__figures,
+  [data-layout='hero'] .chapter__figures,
+  [data-layout='close'] .chapter__figures {
+    order: 2;
+  }
+
+  .chapter__text {
+    max-width: 34rem;
+  }
+
+  [data-layout='right'] .chapter__text {
+    justify-self: start;
+  }
+
+  .figure {
+    width: min(100%, 26rem);
+  }
+}

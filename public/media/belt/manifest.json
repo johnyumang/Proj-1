@@ -1,0 +1,122 @@
+{
+  "version": 1,
+  "about": "Media manifest for the SIIL Ostomy Belt scroll page. Paths are relative to this folder. Files on disk decide which mode a chapter uses (sequence, still or placeholder); this file adds what cannot be measured. See README.md, 'Replacing the images'.",
+  "frame": {
+    "aspect": "4:5",
+    "coordinates": "x and y are fractions of the frame (0,0 = top left, 1,1 = bottom right). Frame numbers start at 1."
+  },
+  "light": {
+    "beige": { "floor": 0.4, "rim": 0.15 },
+    "navy": { "floor": 0.5, "rim": 0.4 },
+    "black": { "floor": 0.55, "rim": 0.55 }
+  },
+  "placeholders": {
+    "beige-front": {
+      "file": "placeholder/Ostomy-BELT-WOMEN-BEIGE-SIIL-Ostomy-3-scaled.jpg",
+      "source": "https://www.siilostomy.com/wp-content/uploads/2025/09/Ostomy-BELT-WOMEN-BEIGE-SIIL-Ostomy-3-scaled.jpg",
+      "width": 1365,
+      "height": 2048,
+      "alpha": false,
+      "alt": "Woman in a beige SIIL Ostomy Belt under an open white shirt"
+    },
+    "beige-access": {
+      "file": "placeholder/Ostomy-BELT-WOMEN-BEIGE-SIIL-Ostomy-6-1-scaled.jpg",
+      "source": "https://www.siilostomy.com/wp-content/uploads/2025/09/Ostomy-BELT-WOMEN-BEIGE-SIIL-Ostomy-6-1-scaled.jpg",
+      "width": 1365,
+      "height": 2048,
+      "alpha": false,
+      "alt": "Woman in a beige SIIL Ostomy Belt lifting its front panel to reach the pouch through the open access zip"
+    },
+    "navy": {
+      "file": "placeholder/Siilostomy76890-683x1024.jpg",
+      "source": "https://www.siilostomy.com/wp-content/uploads/2023/01/Siilostomy76890-683x1024.jpg",
+      "width": 683,
+      "height": 1024,
+      "alpha": false,
+      "alt": "Man in a navy blue SIIL Ostomy Belt under an open light blue shirt"
+    },
+    "black-navy": {
+      "file": "placeholder/ostomy-belt-for-men-and-women-square.jpg",
+      "source": "https://www.siilostomy.com/wp-content/uploads/2026/10/ostomy-belt-for-men-and-women-square.jpg",
+      "width": 1200,
+      "height": 1200,
+      "alpha": false,
+      "alt": "Man in a black SIIL Ostomy Belt beside a woman in a navy blue SIIL Ostomy Belt"
+    }
+  },
+  "chapters": {
+    "hero": {
+      "beige": {
+        "sequence": null,
+        "still": null,
+        "alt": null,
+        "placeholder": { "use": "beige-front" }
+      }
+    },
+    "fit": {
+      "beige": {
+        "sequence": null,
+        "still": null,
+        "alt": null,
+        "hotspots": [],
+        "placeholder": {
+          "use": "beige-front",
+          "hotspots": [
+            { "id": "pocket", "x": 0.371, "y": 0.649, "side": "left" },
+            { "id": "fabric", "x": 0.478, "y": 0.594, "side": "right" }
+          ]
+        }
+      }
+    },
+    "clothes": {
+      "beige": {
+        "sequence": null,
+        "still": null,
+        "alt": null,
+        "placeholder": { "use": "beige-front" }
+      }
+    },
+    "access": {
+      "use": "hero",
+      "beige": {
+        "sequence": null,
+        "still": null,
+        "alt": null,
+        "focal": null,
+        "placeholder": {
+          "use": "beige-access",
+          "focal": { "x": 0.5, "y": 0.7, "w": 0.44, "h": 0.366 }
+        }
+      }
+    },
+    "pool": {
+      "navy": {
+        "sequence": null,
+        "still": null,
+        "alt": null,
+        "placeholder": { "use": "navy" }
+      }
+    },
+    "colors": {
+      "beige": { "sequence": null, "still": null, "alt": null, "placeholder": { "use": "beige-front" } },
+      "navy": { "sequence": null, "still": null, "alt": null, "placeholder": { "use": "navy" } },
+      "black": { "sequence": null, "still": null, "alt": null, "placeholder": { "use": "black-navy" } }
+    },
+    "close": {
+      "beige": { "sequence": null, "still": null, "alt": null, "placeholder": { "use": "beige-front" } },
+      "navy": { "sequence": null, "still": null, "alt": null, "placeholder": { "use": "navy" } },
+      "black": { "sequence": null, "still": null, "alt": null, "placeholder": { "use": "black-navy" } }
+    }
+  },
+  "detail": {
+    "access": {
+      "width": null,
+      "height": null,
+      "alt": null,
+      "placeholder": {
+        "use": "beige-access",
+        "alt": "Close view of the beige belt's access opening: the zip is open and the pouch is drawn out below the front panel"
+      }
+    }
+  }
+}
