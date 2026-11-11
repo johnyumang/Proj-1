@@ -167,6 +167,27 @@ table {
   text-decoration-color: currentColor;
 }
 
+/* A link led by a drawn icon: the icon is not underlined and sits on the text's optical line. */
+.link--icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+}
+
+.link--icon .icon {
+  flex: none;
+  width: 1.15em;
+  height: 1.15em;
+}
+
+/* Links that stand on their own (not inside a sentence) get a full-size touch target. */
+.actions .link,
+.section__more .link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+}
+
 /* ---------- Buttons ---------- */
 
 .btn {
@@ -291,18 +312,22 @@ table {
 
 .deflist {
   display: grid;
-  border-top: 1px solid var(--stage-line);
   max-width: 34rem;
 }
 
+/* The hairlines belong to the rows, so a row and its rule appear and disappear together. */
 .deflist__row {
   display: grid;
   grid-template-columns: 6.5rem minmax(0, 1fr);
   gap: 1rem;
   padding: 0.7rem 0;
-  border-bottom: 1px solid var(--stage-line);
+  border-top: 1px solid var(--stage-line);
   font-size: 0.9375rem;
   line-height: 1.4;
+}
+
+.deflist__row:last-child {
+  border-bottom: 1px solid var(--stage-line);
 }
 
 .deflist dt {

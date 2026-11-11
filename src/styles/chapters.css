@@ -110,7 +110,7 @@
   position: relative;
   z-index: 1;
   grid-area: 1 / 1;
-  width: min(100%, 21rem);
+  width: min(72%, 18rem);
 }
 
 /* Pool of light on the floor under the image, in the chapter accent. */
@@ -125,6 +125,13 @@
   transform: translateX(-50%);
   background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 50%, transparent), color-mix(in srgb, var(--accent) 16%, transparent) 55%, transparent);
   pointer-events: none;
+}
+
+@supports not (color: color-mix(in srgb, red, blue)) {
+  .figure::after {
+    background: radial-gradient(closest-side, var(--accent), transparent);
+    opacity: 0.4;
+  }
 }
 
 /* Placeholder photos are shown as framed plates: a hairline frame, a narrow mat, the photo. */
@@ -171,14 +178,21 @@
   object-fit: contain;
 }
 
-/* The giant word behind the image (hero and close). */
+/* The giant word behind the image (hero and close). On small screens the image is as wide as
+   the word, so it stands in front of the word's base only; on wide screens it overlaps the
+   lower half of the middle letters. */
+.chapter__figures {
+  --word-size: clamp(6.5rem, 30vw, 13rem);
+  --word-cover: 0.78; /* share of the word's height that stays clear above the image */
+}
+
 .figure__word {
   position: absolute;
   z-index: 0;
   left: 50%;
-  top: 2%;
+  top: 0;
   transform: translateX(-50%);
-  font: 900 clamp(7rem, 26vw, 22rem) / 1 var(--font-display);
+  font: 900 var(--word-size) / 1 var(--font-display);
   letter-spacing: -0.04em;
   white-space: nowrap;
   background: linear-gradient(90deg, var(--ink-2), var(--accent));
@@ -187,6 +201,10 @@
   color: transparent;
   pointer-events: none;
   user-select: none;
+}
+
+.figure__word ~ .figure {
+  margin-top: calc(var(--word-size) * var(--word-cover));
 }
 
 /* Colour choice: one still per colour, the chosen one is shown. */
@@ -228,11 +246,12 @@
     max-width: 34rem;
   }
 
-  [data-layout='right'] .chapter__text {
-    justify-self: start;
-  }
-
   .figure {
     width: min(100%, 26rem);
+  }
+
+  .chapter__figures {
+    --word-size: clamp(13rem, 25vw, 24rem);
+    --word-cover: 0.5;
   }
 }

@@ -8,7 +8,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview --port 4173 --strictPort",
-    "manifest": "node scripts/scan-media.mjs"
+    "manifest": "node scripts/scan-media.mjs",
+    "single": "node scripts/single-file.mjs"
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"

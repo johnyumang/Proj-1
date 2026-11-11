@@ -6,6 +6,9 @@
  * chapter, because small screens show the text panels of a chapter one after another:
  *   desktop   900 px and wider: text beside the model
  *   compact   below 900 px: model in the upper half, text panels take turns in the lower half
+ *   mid       900–1199 px, hero and closing chapter only: these two need three columns on
+ *             desktop (copy left, model centre, more copy right). Where that does not fit they
+ *             keep the model on the right and show their two text panels one after the other.
  *
  * move      the stage change that opens the chapter: the model travels to its place, images
  *           cross-fade, the accent colour and the giant word change
@@ -20,6 +23,11 @@
 
 export const SCRUB = 0.8;
 export const COMPACT_QUERY = '(max-width: 899px)';
+export const MID_QUERY = '(min-width: 900px) and (max-width: 1199px)';
+
+/** The schedule a chapter uses in a layout: 'compact', 'mid' or 'desktop'. */
+export const configFor = (chapter, layout) =>
+  layout === 'compact' ? chapter.compact : layout === 'mid' && chapter.mid ? chapter.mid : chapter.desktop;
 
 export const CHAPTERS = [
   {
@@ -30,6 +38,13 @@ export const CHAPTERS = [
       pose: { x: 0, y: 0.03, s: 0.94 },
       drift: { y: -0.012, s: 0.03 },
       panels: { a: { in: null, out: [0.42, 0.74] }, b: { in: null, out: [0.5, 0.82] } },
+      frames: [0, 1],
+      settle: 0,
+    },
+    mid: {
+      pose: { x: 1, y: 0, s: 1 },
+      drift: { y: -0.01, s: 0.03 },
+      panels: { a: { in: null, out: [0.16, 0.32] }, b: { in: [0.34, 0.5], out: [0.8, 0.95] } },
       frames: [0, 1],
       settle: 0,
     },
@@ -59,7 +74,7 @@ export const CHAPTERS = [
       pose: { x: -1 },
       drift: { s: 0.03 },
       move: [0, 0.1],
-      panels: { a: { in: [0.06, 0.16], out: [0.5, 0.56] }, b: { in: [0.57, 0.67], out: [0.9, 0.98] } },
+      panels: { a: { in: [0.06, 0.16], out: [0.54, 0.6] }, b: { in: [0.61, 0.71], out: [0.9, 0.98] } },
       counters: [{ count: [0.08, 0.2], out: [0.25, 0.29] }, { in: [0.28, 0.32], count: [0.3, 0.46] }],
       hotspots: { in: [0.16, 0.28], out: [0.86, 0.92] },
       frames: [0.1, 0.86],
@@ -82,7 +97,7 @@ export const CHAPTERS = [
       pose: { x: 0 },
       drift: { s: 0.03 },
       move: [0, 0.1],
-      panels: { a: { in: [0.08, 0.18], out: [0.46, 0.52] }, b: { in: [0.53, 0.63], out: [0.9, 0.98] } },
+      panels: { a: { in: [0.08, 0.18], out: [0.54, 0.6] }, b: { in: [0.61, 0.71], out: [0.9, 0.98] } },
       frames: [0.1, 0.86],
       settle: 0.32,
     },
@@ -95,10 +110,9 @@ export const CHAPTERS = [
       pose: { x: 0, y: 0, s: 1 },
       move: [0, 0.09],
       push: [0.09, 0.38], // camera pushes in on the access opening
-      dissolve: [0.28, 0.4], // the model dissolves …
-      detailIn: [0.27, 0.38], // … into the close view, full frame at first,
-      detailSettle: [0.36, 0.52], // which then floats free beside the text
-      detailOut: [0.9, 0.985],
+      detailIn: [0.25, 0.34], // the close view fades in exactly on top of it, full frame at first,
+      dissolve: [0.33, 0.41], // then the model behind it dissolves
+      detailSettle: [0.36, 0.52], // which then floats free beside the text (and leaves as chapter 5 opens)
       panels: {
         a: { in: [0.48, 0.58], out: [0.88, 0.96] },
         b: { in: [0.54, 0.64], out: [0.89, 0.97] },
@@ -110,10 +124,9 @@ export const CHAPTERS = [
       pose: { x: 0 },
       move: [0, 0.06],
       push: [0.06, 0.25],
-      dissolve: [0.19, 0.27],
-      detailIn: [0.18, 0.26],
+      detailIn: [0.16, 0.22],
+      dissolve: [0.215, 0.27],
       detailSettle: [0.25, 0.37],
-      detailOut: [0.93, 0.99],
       panels: {
         a: { in: [0.36, 0.44], out: [0.52, 0.57] },
         b: { in: [0.58, 0.65], out: [0.73, 0.78] },
@@ -138,7 +151,7 @@ export const CHAPTERS = [
       pose: { x: 0 },
       drift: { s: 0.03 },
       move: [0, 0.1],
-      panels: { a: { in: [0.08, 0.18], out: [0.46, 0.52] }, b: { in: [0.53, 0.63], out: [0.9, 0.98] } },
+      panels: { a: { in: [0.08, 0.18], out: [0.54, 0.6] }, b: { in: [0.61, 0.71], out: [0.9, 0.98] } },
       frames: [0.1, 0.86],
       settle: 0.32,
     },
@@ -158,7 +171,7 @@ export const CHAPTERS = [
       pose: { x: 0 },
       drift: { s: 0.03 },
       move: [0, 0.1],
-      panels: { a: { in: [0.1, 0.22], out: [0.9, 0.98] } },
+      panels: { a: { in: [0.07, 0.2], out: [0.9, 0.98] } },
       settle: 0.5,
     },
   },
@@ -174,12 +187,20 @@ export const CHAPTERS = [
       counters: [{ count: [0.34, 0.62] }],
       settle: 0.8,
     },
+    mid: {
+      pose: { x: 1, y: 0, s: 1 },
+      drift: { s: 0.02 },
+      move: [0, 0.12],
+      panels: { a: { in: [0.1, 0.22], out: [0.54, 0.6] }, b: { in: [0.6, 0.72], out: null } },
+      counters: [{ count: [0.64, 0.86] }],
+      settle: 0.3,
+    },
     compact: {
       pose: { x: 0 },
       drift: { s: 0.02 },
       move: [0, 0.12],
-      panels: { a: { in: [0.1, 0.22], out: [0.42, 0.48] }, b: { in: [0.5, 0.62], out: null } },
-      counters: [{ count: [0.54, 0.76] }],
+      panels: { a: { in: [0.1, 0.22], out: [0.54, 0.6] }, b: { in: [0.6, 0.72], out: null } },
+      counters: [{ count: [0.64, 0.86] }],
       settle: 0.3,
     },
   },

@@ -10,7 +10,7 @@
  *   lines  headline split into lines     fade  one block     each  children, staggered
  */
 import { html } from './html.js';
-import { COLOR_IDS, buyButton, chips, colorLabel, figure } from './parts.js';
+import { COLOR_IDS, buyButton, chips, colorLabel, figure, rulerLabel } from './parts.js';
 
 /** Order of content.fit.hotspots. The ids link the copy to positions in manifest.json. */
 export const HOTSPOT_IDS = ['pocket', 'fastening', 'fabric'];
@@ -34,7 +34,7 @@ function figures(ctx, id, { eager = false } = {}) {
 }
 
 const counter = ({ from = 0, to, unit }) =>
-  html`<p class="counter" data-counter data-from="${from}" data-to="${to}"><span class="counter__num">${to}</span><span class="counter__unit">${unit}</span></p>`;
+  html`<p class="counter" data-counter data-from="${from}" data-to="${to}"><span class="counter__num">${to}</span> <span class="counter__unit">${unit}</span></p>`;
 
 function hero(ctx) {
   const { content: c, brief } = ctx;
@@ -53,14 +53,14 @@ function hero(ctx) {
         <div class="g g--actions">
           <div class="actions" data-a="fade">
             ${buyButton({ label: c.hero.cta, content: c, ui: ctx.ui })}
-            <a class="link" href="#size-guide">${c.hero.secondary}</a>
+            <a class="link link--icon" href="#size-guide">${rulerLabel(c.hero.secondary).icon}${rulerLabel(c.hero.secondary).text}</a>
           </div>
           <p class="note" data-a="fade">${c.hero.shipping}</p>
         </div>
       </div>
       <div class="panel" data-panel="b">
-        <ul class="g g--bullets bullets" data-a="each">${c.hero.bullets.map((b) => html`<li>${b}</li>`)}</ul>
-        <p class="g g--spec specline" data-a="fade">${c.hero.specline}</p>
+        <div class="g g--bullets"><ul class="bullets" data-a="each">${c.hero.bullets.map((b) => html`<li>${b}</li>`)}</ul></div>
+        <div class="g g--spec"><p class="specline" data-a="fade">${c.hero.specline}</p></div>
       </div>`,
   });
 }
@@ -75,7 +75,7 @@ function fit(ctx) {
     text: html`
       <div class="panel" data-panel="a">
         <p class="eyebrow" data-a="fade">${c.fit.eyebrow}</p>
-        <div class="counters" aria-hidden="true">
+        <div class="counters" aria-hidden="true" data-a="fade">
           ${counter({ from: 0, to: c.fit.counter1.value, unit: c.fit.counter1.unit })}
           ${counter({ from: c.fit.counter2.from, to: c.fit.counter2.to, unit: c.fit.counter2.unit })}
         </div>
@@ -197,7 +197,7 @@ function close(ctx) {
         <p class="body" data-a="fade">${c.close.body}</p>
       </div>
       <div class="panel" data-panel="b">
-        <div class="counters" aria-hidden="true">${counter({ from: 0, to: c.close.counter.value, unit: c.close.counter.unit })}</div>
+        <div class="counters" aria-hidden="true" data-a="fade">${counter({ from: 0, to: c.close.counter.value, unit: c.close.counter.unit })}</div>
         <p class="body body--small" data-a="fade">${c.close.returns}</p>
         <div class="actions" data-a="fade">${buyButton({ label: c.close.cta, content: c, ui: ctx.ui })}</div>
         <ul class="lines" data-a="each">${c.close.lines.map((line) => html`<li>${line}</li>`)}</ul>

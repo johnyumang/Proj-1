@@ -10,21 +10,24 @@ export function createQueue({ concurrency = 4 } = {}) {
   const pending = [];
   let running = 0;
   let stopped = false;
+  let background = false; // background jobs wait until the first view is on screen
   let focus = 0; // index of the chapter the reader is in
 
   const pump = () => {
     while (!stopped && running < concurrency && pending.length) {
       // Lowest score first: urgent jobs, then distance from the current chapter, then order.
-      let best = 0;
+      let best = -1;
       let bestScore = Infinity;
       for (let i = 0; i < pending.length; i += 1) {
         const job = pending[i];
+        if (!job.urgent && !background) continue;
         const score = job.urgent ? -1 : Math.abs(job.chapter - focus) * 1000 + job.order;
         if (score < bestScore) {
           bestScore = score;
           best = i;
         }
       }
+      if (best < 0) return;
       const [job] = pending.splice(best, 1);
       running += 1;
       Promise.resolve()
@@ -45,6 +48,11 @@ export function createQueue({ concurrency = 4 } = {}) {
     },
     setFocus(index) {
       focus = index;
+    },
+    /** Lets the background jobs run (call once the first view has what it needs). */
+    startBackground() {
+      background = true;
+      pump();
     },
     stop() {
       stopped = true;
@@ -85,7 +93,7 @@ export class Sequence {
     this.width = width;
     this.height = height;
     this.images = new Array(frames).fill(null);
-    this.requested = new Array(frames).fill(false);
+    this.promises = new Array(frames).fill(null);
     this.onFrame = null;
   }
 
@@ -95,13 +103,14 @@ export class Sequence {
 
   /** Loads one frame (once). */
   load(index) {
-    if (this.requested[index]) return Promise.resolve(this.images[index]);
-    this.requested[index] = true;
-    return loadImage(this.url(index)).then((img) => {
-      this.images[index] = img;
-      if (img && this.onFrame) this.onFrame(index);
-      return img;
-    });
+    if (!this.promises[index]) {
+      this.promises[index] = loadImage(this.url(index)).then((img) => {
+        this.images[index] = img;
+        if (img && this.onFrame) this.onFrame(index);
+        return img;
+      });
+    }
+    return this.promises[index];
   }
 
   /** Queues every frame: the first one at once, the rest in the background. */

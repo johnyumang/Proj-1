@@ -83,6 +83,7 @@
 
 .compare__col {
   padding-block: 0.9rem;
+  border-top: 3px solid transparent;
   font: 600 0.75rem / 1.2 var(--font-body);
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -244,7 +245,7 @@
 .units__label {
   display: inline-flex;
   align-items: center;
-  min-height: 2.5rem;
+  min-height: 2.75rem; /* 44 px touch target */
   padding: 0 1.2rem;
   border-radius: 999px;
   font-size: 0.875rem;

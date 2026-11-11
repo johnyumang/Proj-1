@@ -14,7 +14,7 @@
  * Only transform, opacity, the canvas and the accent custom property are written.
  */
 import { gsap } from './gsap.js';
-import { CHAPTERS } from './chapters.js';
+import { CHAPTERS, configFor } from './chapters.js';
 import { Sequence, createQueue } from './loader.js';
 
 const FRAME_ASPECT = 4 / 5; // width / height of the rig box, the format of the own-model plates
@@ -27,8 +27,13 @@ const ACCENT_TOKENS = {
 };
 const CHOICE_TOKENS = { beige: '--accent-beige', navy: '--accent-blue', black: '--accent-black' };
 const DEFAULT_FOCAL = { x: 0.5, y: 0.55, w: 0.4, h: 0.4 };
+const DEFAULT_LIGHT = { floor: 0.45, rim: 0.3 };
+export const DETAIL_EXIT = 0.5; // share of the next chapter's opening move in which the chapter-4 detail leaves
 
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+/** A placeholder photo shown whole, in a frame. Cut-outs (own-model images, or a product photo
+ *  with its background removed) have no frame and stand on the floor line. */
+const isFramed = (visual) => visual.mode === 'placeholder' && !visual.cutout;
 const clamp01 = (v) => clamp(v, 0, 1);
 
 function el(tag, className, parent) {
@@ -38,20 +43,23 @@ function el(tag, className, parent) {
   return node;
 }
 
-export function createStage({ story, plan, word, compact, choice: initialChoice }) {
+export function createStage({ story, plan, word, layout, choice: initialChoice }) {
+  const compact = layout === 'compact';
+  const cfgOf = (ch) => configFor(ch, layout);
   const rootStyle = getComputedStyle(document.documentElement);
   const nav = document.querySelector('[data-nav]');
   const bar = document.querySelector('[data-buybar]');
-  const sections = Object.fromEntries(CHAPTERS.map((ch) => [ch.id, story.querySelector(`[data-chapter="${ch.id}"]`)]));
-  const mode = compact ? 'compact' : 'desktop';
+  const sections = Object.fromEntries(CHAPTERS.map((ch) => [ch.id, story.querySelector(`.chapter[data-chapter="${ch.id}"]`)]));
   const mediaUrl = (rel) => `./${plan.base}/${rel.split('/').map(encodeURIComponent).join('/')}`;
   const tokenRgb = (name) => gsap.utils.splitColor(rootStyle.getPropertyValue(name).trim() || '#9a7e4f').slice(0, 3);
   const accents = Object.fromEntries(Object.entries(ACCENT_TOKENS).map(([k, token]) => [k, tokenRgb(token)]));
   const choiceAccents = Object.fromEntries(Object.entries(CHOICE_TOKENS).map(([k, token]) => [k, tokenRgb(token)]));
 
   // ---------- DOM ----------
-  const stageEl = el('div', 'stage');
-  stageEl.setAttribute('aria-hidden', 'true');
+  // The stage element is part of the page markup (empty), so the document has its final
+  // height before any script runs and a reload restores the scroll position correctly.
+  const stageEl = story.querySelector('[data-stage]');
+  stageEl.textContent = '';
   const ambientEl = el('div', 'stage__ambient', stageEl);
   const wordEl = el('p', 'stage__word', stageEl);
   const letters = [...word].map((ch) => {
@@ -65,7 +73,6 @@ export function createStage({ story, plan, word, compact, choice: initialChoice 
   el('div', 'rig__floor', rigInner);
   const canvas = el('canvas', 'rig__canvas', rigInner);
   const ctx = canvas.getContext('2d');
-  story.insertBefore(stageEl, story.firstChild);
 
   // ---------- Visuals: one entry per distinct image or sequence ----------
   const queue = createQueue({ concurrency: 4 });
@@ -84,7 +91,10 @@ export function createStage({ story, plan, word, compact, choice: initialChoice 
 
   function register(visual, chapterIndex) {
     if (visuals.has(visual.key)) return visuals.get(visual.key);
-    const entry = { key: visual.key, visual, weight: 0, rect: { left: 0, top: 0, w: 0, h: 0 }, shown: -1, chapters: [] };
+    const entry = { key: visual.key, visual, weight: 0, rect: { left: 0, top: 0, w: 0, h: 0 }, chapters: [] };
+    entry.ready = new Promise((resolve) => {
+      entry.markReady = resolve;
+    });
     if (visual.mode === 'sequence') {
       const small = compact && visual.small;
       entry.seq = new Sequence({
@@ -98,12 +108,14 @@ export function createStage({ story, plan, word, compact, choice: initialChoice 
         canvasStale = true;
       };
       entry.seq.preload(queue, chapterIndex);
+      entry.seq.load(0).then(entry.markReady);
     } else {
       entry.el = el('div', `rig__layer rig__layer--${visual.mode}`, rigInner);
       entry.el.dataset.key = visual.key;
-      const frame = el('div', visual.mode === 'placeholder' ? 'plate' : 'cutout', entry.el);
+      const frame = el('div', isFramed(visual) ? 'plate' : 'cutout', entry.el);
       if (visual.missing) {
         markMissing(entry);
+        entry.markReady();
       } else {
         const img = el('img', '', frame);
         img.alt = '';
@@ -114,15 +126,19 @@ export function createStage({ story, plan, word, compact, choice: initialChoice 
         entry.img = img;
         const load = () =>
           new Promise((resolve) => {
-            img.onload = resolve;
+            const done = () => {
+              entry.markReady();
+              resolve();
+            };
+            img.onload = done;
             img.onerror = () => {
               markMissing(entry); // never a stand-in: a neutral card with the file name
-              resolve();
+              done();
             };
             if (visual.sources && visual.sources.length > 1) {
               img.srcset = visual.sources.map((s) => `${mediaUrl(s.src)} ${s.w}w`).join(', ');
               // The chapter-4 plate is pushed in until one detail fills the screen, so it needs the full file.
-              img.sizes = entry.wide ? '100vw' : '(max-width: 899px) 58vw, 30vw';
+              img.sizes = entry.wide ? '100vw' : plan.sizes;
             }
             img.src = mediaUrl(visual.src);
           });
@@ -144,11 +160,13 @@ export function createStage({ story, plan, word, compact, choice: initialChoice 
       entry.chapters.push(index);
       keys[color] = visual.key;
     }
-    return { colors: def.colors, keys };
+    return { colors: def.colors, keys, variants: def.variants };
   });
   for (const entry of visuals.values()) {
     if (entry.load) queue.add(entry.load, { chapter: entry.chapters[0], urgent: entry.chapters[0] === 0 });
   }
+  // Resolves when everything the first chapter shows has arrived (or failed).
+  const heroReady = Promise.all([...visuals.values()].filter((entry) => entry.chapters[0] === 0).map((entry) => entry.ready));
 
   // Consecutive chapters that show the same image(s) form a run; images cross-fade between runs only.
   const runs = [];
@@ -157,7 +175,7 @@ export function createStage({ story, plan, word, compact, choice: initialChoice 
     const signature = ck.colors.map((c) => `${c}=${ck.keys[c]}`).join('|');
     const last = runs[runs.length - 1];
     if (last && last.signature === signature) last.chapters.push(index);
-    else runs.push({ signature, first: index, chapters: [index], colors: ck.colors, keys: ck.keys });
+    else runs.push({ signature, first: index, chapters: [index], colors: ck.colors, keys: ck.keys, variants: ck.variants });
     runOf[index] = runs.length - 1;
   });
 
@@ -167,12 +185,13 @@ export function createStage({ story, plan, word, compact, choice: initialChoice 
     const ck = chapterKeys[index];
     if (ck.colors.length !== 1) return;
     const entry = visuals.get(ck.keys[ck.colors[0]]);
+    const hotspots = ck.variants[ck.colors[0]].hotspots || [];
     const list = sections[ch.id].querySelector('[data-hotspots]');
-    if (!list || !entry.visual.hotspots || !entry.visual.hotspots.length || entry.visual.missing) return;
+    if (!list || !hotspots.length || entry.visual.missing) return;
     const layer = el('div', 'rig__hotspots', rigInner);
-    layer.dataset.chapter = ch.id;
+    layer.dataset.for = ch.id;
     const nodes = [];
-    for (const spot of entry.visual.hotspots) {
+    for (const spot of hotspots) {
       const item = list.querySelector(`[data-hotspot="${spot.id}"]`);
       if (!item) continue;
       item.classList.add('is-staged');
@@ -223,10 +242,53 @@ export function createStage({ story, plan, word, compact, choice: initialChoice 
     : FRAME_ASPECT;
 
   // ---------- Geometry ----------
-  const g = { vw: 0, vh: 0, navH: 64, rigW: 0, rigH: 0, cx0: 0, cy0: 0, ux: 0, dpr: 1, detail: { w: 0, h: 0, cx: 0, cy: 0 } };
+  const g = { vw: 0, vh: 0, navH: 64, rigW: 0, rigH: 0, cx0: 0, cy0: 0, ux: 0, dpr: 1, frame: 6, detail: { w: 0, h: 0, cx: 0, cy: 0 } };
 
-  function wordFontSize() {
-    return parseFloat(getComputedStyle(wordEl).fontSize) || 144;
+  /** Where the giant word's capitals start and end on the stage (y of cap top and baseline). */
+  function wordLines() {
+    const style = getComputedStyle(wordEl);
+    const size = parseFloat(style.fontSize) || 144;
+    const probe = canvas.getContext('2d');
+    probe.save();
+    probe.font = `${style.fontWeight} ${size}px ${style.fontFamily}`;
+    const m = probe.measureText(word || 'L');
+    probe.restore();
+    const ascent = m.fontBoundingBoxAscent || size * 0.95;
+    const descent = m.fontBoundingBoxDescent || size * 0.25;
+    const cap = m.actualBoundingBoxAscent || size * 0.7;
+    const lineHeight = parseFloat(style.lineHeight) || size;
+    const baseline = wordEl.offsetTop + (lineHeight - (ascent + descent)) / 2 + ascent;
+    return { capTop: baseline - cap, baseline, cap };
+  }
+
+  /**
+   * The giant word is sized by viewport width. On wide, short viewports its bright right half
+   * would reach down into the text that sits bottom right in the hero and closing chapters, so
+   * here it is scaled down just enough to stay clear of it.
+   */
+  function fitWord() {
+    wordEl.style.fontSize = '';
+    if (compact) return;
+    const size = parseFloat(getComputedStyle(wordEl).fontSize);
+    const lines = wordLines();
+    const centre = wordEl.offsetLeft; // the element is centred on its left offset
+    const wordRight = centre + wordEl.offsetWidth / 2;
+    let limit = Infinity;
+    for (const ch of CHAPTERS) {
+      if (!ch.word) continue;
+      const pin = sections[ch.id].querySelector('.chapter__pin').getBoundingClientRect();
+      for (const block of sections[ch.id].querySelectorAll('.g, .panel')) {
+        const r = block.getBoundingClientRect();
+        if (!r.width || !r.height) continue; // display: contents
+        const left = r.left - pin.left;
+        if (left >= centre - 10 && left < wordRight + 12) limit = Math.min(limit, r.top - pin.top - 14);
+      }
+    }
+    if (lines.baseline <= limit) return;
+    // The baseline moves linearly with the font size: baseline = anchor + k * size.
+    const anchor = wordEl.offsetTop + 0.15 * size;
+    const fitted = (size * (limit - anchor)) / (lines.baseline - anchor);
+    wordEl.style.fontSize = `${Math.max(144, Math.floor(fitted))}px`; // 9rem, the lower bound of the scale
   }
 
   /** Room for the model above the text of a chapter on compact screens. */
@@ -236,17 +298,43 @@ export function createStage({ story, plan, word, compact, choice: initialChoice 
       textTop = Math.min(textTop, panel.offsetTop);
     });
     if (!Number.isFinite(textTop)) textTop = g.vh * 0.55;
-    const peek = ch.word ? wordFontSize() * 0.36 : 0; // let the giant word show above the model
-    const top = g.navH + 6 + peek;
-    const height = clamp(textTop - 18 - top, g.vh * 0.2, Math.min(g.vh * 0.46, g.vw * 1.02));
-    return { top, height };
+    let top = g.navH + 6;
+    if (ch.word) {
+      // Hero and close: the model stands in front of the base of the giant word, which stays
+      // readable above it. Where that leaves too little room (small phones, long text), it
+      // climbs in front of the lower half of the letters instead of shrinking away.
+      const lines = wordLines();
+      const hang = lines.baseline - lines.cap * 0.1;
+      const want = Math.min(g.vh * 0.3, g.vw * 0.8);
+      const rise = clamp(want - (textTop - 18 - hang), 0, lines.cap * 0.5);
+      top = Math.max(top, hang - rise);
+    }
+    const room = textTop - 18 - top;
+    const height = clamp(room, g.vh * 0.2, Math.min(g.vh * 0.46, g.vw * 1.02));
+    return { top, height, room, anchored: Boolean(ch.word) };
   }
 
   function poseFor(ch) {
-    const cfg = ch[mode];
+    const cfg = cfgOf(ch);
     if (!compact) return { x: cfg.pose.x, y: cfg.pose.y, s: cfg.pose.s };
     const zone = compactZone(ch);
-    return { x: cfg.pose.x || 0, y: (zone.top + zone.height / 2 - g.cy0) / g.vh, s: zone.height / g.rigH };
+    let height = zone.height;
+    let x = cfg.pose.x || 0;
+    const spots = hotspotLayers.find((layer) => CHAPTERS[layer.chapter] === ch);
+    if (spots) {
+      // Hotspot notes sit to the right of the picture: keep it small enough to leave them
+      // room, and centre picture and notes together (on a phone that parks it at the left edge).
+      const ar = Math.min(spots.entry.visual.width / spots.entry.visual.height, FRAME_ASPECT);
+      const noteRoom = 150;
+      height = Math.min(height, Math.max(g.vh * 0.2, (g.vw - 24 - noteRoom) / ar));
+      const pictureW = height * ar + (isFramed(spots.entry.visual) ? 8 : 0);
+      const left = Math.max(12, (g.vw - pictureW - noteRoom) / 2);
+      x = (left + pictureW / 2 - g.cx0) / g.ux;
+    }
+    // Under the giant word the picture hangs from the word's base; otherwise it floats a
+    // little above the middle of the room it has.
+    const top = zone.anchored ? zone.top : zone.top + Math.max(0, zone.room - height) * 0.4;
+    return { x, y: (top + height / 2 - g.cy0) / g.vh, s: height / g.rigH };
   }
 
   function containRect(visual) {
@@ -261,15 +349,17 @@ export function createStage({ story, plan, word, compact, choice: initialChoice 
       h = w / ar;
     }
     // Plates are centred; cut-out figures stand on the floor line.
-    const top = visual.mode === 'placeholder' ? (g.rigH - h) / 2 : g.rigH - h;
+    const top = isFramed(visual) ? (g.rigH - h) / 2 : g.rigH - h;
     return { left: (g.rigW - w) / 2, top, w, h };
   }
 
   function measure() {
     g.vw = stageEl.clientWidth;
-    g.vh = stageEl.clientHeight;
+    // Height of a chapter's pin (the small viewport); the stage element itself may be taller.
+    g.vh = sections[CHAPTERS[0].id].querySelector('.chapter__pin').offsetHeight || stageEl.clientHeight;
     g.navH = nav ? nav.offsetHeight : 64;
     g.dpr = Math.min(window.devicePixelRatio || 1, 2);
+    fitWord();
     if (compact) {
       g.rigH = Math.min(g.vh * 0.36, g.vw * 0.98);
       g.cx0 = g.vw / 2;
@@ -289,14 +379,19 @@ export function createStage({ story, plan, word, compact, choice: initialChoice 
       top: `${g.cy0 - g.rigH / 2}px`,
     });
 
+    // entry.rect is the picture itself, so fractions of the frame (hotspots, focal region) are
+    // exact. A placeholder plate adds its frame around that rectangle.
+    g.frame = compact ? 4 : Math.round(clamp(g.vw * 0.0045, 4, 8));
+    rigInner.style.setProperty('--frame', `${g.frame}px`);
     for (const entry of visuals.values()) {
       entry.rect = containRect(entry.visual);
+      entry.pad = isFramed(entry.visual) ? g.frame : 0;
       if (entry.el) {
         Object.assign(entry.el.style, {
-          left: `${entry.rect.left}px`,
-          top: `${entry.rect.top}px`,
-          width: `${entry.rect.w}px`,
-          height: `${entry.rect.h}px`,
+          left: `${entry.rect.left - entry.pad}px`,
+          top: `${entry.rect.top - entry.pad}px`,
+          width: `${entry.rect.w + entry.pad * 2}px`,
+          height: `${entry.rect.h + entry.pad * 2}px`,
         });
       }
     }
@@ -304,10 +399,44 @@ export function createStage({ story, plan, word, compact, choice: initialChoice 
     for (const hs of hotspotLayers) {
       const r = hs.entry.rect;
       Object.assign(hs.layer.style, { left: `${r.left}px`, top: `${r.top}px`, width: `${r.w}px`, height: `${r.h}px` });
+      // Where the picture rests in this chapter, to know how much room a note has beside it.
+      const ch = CHAPTERS[hs.chapter];
+      const pose = poseFor(ch);
+      const scale = pose.s + ((cfgOf(ch).drift || {}).s || 0);
+      const centre = g.cx0 + pose.x * g.ux;
+      const edgeLeft = centre + scale * (r.left - hs.entry.pad - g.rigW / 2);
+      const edgeRight = centre + scale * (r.left + r.w + hs.entry.pad - g.rigW / 2);
+      let textRight = 0;
+      if (!compact) {
+        sections[ch.id].querySelectorAll('.panel').forEach((panel) => {
+          textRight = Math.max(textRight, panel.offsetLeft + panel.offsetWidth);
+        });
+      }
+      const gap = compact ? 4 : 14;
       for (const { node, spot } of hs.nodes) {
-        const side = node.dataset.side;
-        const toEdge = (side === 'right' ? 1 - spot.x : spot.x) * r.w;
-        node.style.setProperty('--reach', `${Math.round(toEdge + (compact ? 4 : 14))}px`);
+        const right = node.dataset.side === 'right';
+        const toEdge = (right ? 1 - spot.x : spot.x) * r.w + hs.entry.pad;
+        const lead = (compact ? 18 : 24) * scale + gap * scale; // line overhang plus the gap before the note
+        const room = right ? g.vw - 16 - edgeRight - lead : edgeLeft - lead - textRight - 20;
+        node.style.setProperty('--reach', `${Math.round(toEdge + gap)}px`);
+        node.style.setProperty('--note-max', `${Math.max(72, Math.floor(room / scale))}px`);
+        node.style.setProperty('--note-shift', '0px');
+      }
+      // Notes on the same side must not run into each other when their dots sit close together:
+      // push them apart, half of the correction upwards and half downwards.
+      for (const side of ['left', 'right']) {
+        const column = hs.nodes
+          .filter(({ node }) => node.dataset.side === side)
+          .map(({ node, spot }) => ({ node, top: spot.y * r.h, height: node.querySelector('.hotspot__note').offsetHeight, shift: 0 }))
+          .sort((a, b) => a.top - b.top);
+        let pushed = 0;
+        for (let i = 1; i < column.length; i += 1) {
+          const min = column[i - 1].top + column[i - 1].shift + column[i - 1].height + 3;
+          column[i].shift = Math.max(0, min - column[i].top);
+          pushed = Math.max(pushed, column[i].shift);
+        }
+        if (!pushed) continue;
+        for (const item of column) item.node.style.setProperty('--note-shift', `${Math.round(item.shift - pushed / 2)}px`);
       }
     }
 
@@ -330,7 +459,7 @@ export function createStage({ story, plan, word, compact, choice: initialChoice 
         const zone = compactZone(access);
         h = Math.min(zone.height, (g.vw * 0.8) / detailAspect);
         cx = g.vw / 2;
-        cy = zone.top + zone.height / 2;
+        cy = zone.top + Math.max(0, zone.room - h) * 0.4 + h / 2;
       } else {
         h = Math.min(g.vh * 0.62, (g.vw * 0.3) / detailAspect);
         cx = g.cx0 + g.ux;
@@ -375,12 +504,16 @@ export function createStage({ story, plan, word, compact, choice: initialChoice 
     proxies = [];
     let prevEnd = null;
     let prevWord = CHAPTERS[0].word;
+    // GSAP writes tweened numbers rounded to six decimals. Key values are rounded the same way,
+    // so a proxy holds exactly the same number whether or not its tween has rendered yet.
+    const r6 = (v) => Math.round(v * 1e6) / 1e6;
     CHAPTERS.forEach((ch, index) => {
-      const cfg = ch[mode];
-      const pose = poseFor(ch);
+      const cfg = cfgOf(ch);
+      const raw = poseFor(ch);
+      const pose = { x: r6(raw.x), y: r6(raw.y), s: r6(raw.s) };
       const drift = cfg.drift || {};
       const start = prevEnd || pose;
-      const end = { x: pose.x + (drift.x || 0), y: pose.y + (drift.y || 0), s: pose.s + (drift.s || 0) };
+      const end = { x: r6(pose.x + (drift.x || 0)), y: r6(pose.y + (drift.y || 0)), s: r6(pose.s + (drift.s || 0)) };
       proxies.push({
         id: ch.id,
         x: start.x, y: start.y, s: start.s,
@@ -389,7 +522,7 @@ export function createStage({ story, plan, word, compact, choice: initialChoice 
         m: index === 0 ? 1 : 0, // cross-fade into this chapter's image (only used when it starts a run)
         a: index === 0 ? 1 : 0, // mix towards this chapter's accent
         frame: 0,
-        push: 0, dissolve: 0, detail: 0, detailAlpha: 0, detailOut: 0,
+        push: 0, dissolve: 0, detail: 0, detailAlpha: 0,
       });
       prevEnd = end;
       prevWord = ch.word;
@@ -399,6 +532,7 @@ export function createStage({ story, plan, word, compact, choice: initialChoice 
   }
 
   // ---------- Render ----------
+  const accessIndex = CHAPTERS.findIndex((ch) => ch.id === 'access');
   const last = [];
   const snapshot = [];
   const cache = new Map();
@@ -423,7 +557,7 @@ export function createStage({ story, plan, word, compact, choice: initialChoice 
     for (const p of proxies) {
       snapshot[n++] = p.x; snapshot[n++] = p.y; snapshot[n++] = p.s; snapshot[n++] = p.word;
       snapshot[n++] = p.m; snapshot[n++] = p.a; snapshot[n++] = p.frame;
-      snapshot[n++] = p.push; snapshot[n++] = p.dissolve; snapshot[n++] = p.detail; snapshot[n++] = p.detailAlpha; snapshot[n++] = p.detailOut;
+      snapshot[n++] = p.push; snapshot[n++] = p.dissolve; snapshot[n++] = p.detail; snapshot[n++] = p.detailAlpha;
     }
     snapshot[n++] = choice.beige; snapshot[n++] = choice.navy; snapshot[n++] = choice.black;
     snapshot[n++] = intro.light;
@@ -469,28 +603,57 @@ export function createStage({ story, plan, word, compact, choice: initialChoice 
     const accentCss = `rgb(${Math.round(accent[0])} ${Math.round(accent[1])} ${Math.round(accent[2])})`;
     for (const sink of accentSinks) setStyle(sink, '--accent', accentCss);
 
+    // Chapter 4 dissolves the model into the close view. If the chapter after it shows the very
+    // same image (no cross-fade to bring it back), that chapter's opening undoes the dissolve.
+    const pa = proxies[accessIndex];
+    const nextChapter = proxies[accessIndex + 1] || null;
+    const reopen = nextChapter && runOf[accessIndex + 1] === runOf[accessIndex] ? clamp01(nextChapter.a) : 0;
+
     // Image weights: each run fades in when its first chapter opens and out when the next run does.
+    // The floor and rim light follow whichever image is showing (dark belts get more of both).
+    let floor = 0;
+    let rim = 0;
     for (const entry of visuals.values()) entry.weight = 0;
     for (let r = 0; r < runs.length; r += 1) {
       const run = runs[r];
       const fadeIn = r === 0 ? 1 : clamp01(proxies[run.first].m);
       const fadeOut = r + 1 < runs.length ? clamp01(proxies[runs[r + 1].first].m) : 0;
-      let dissolved = 0;
-      for (const index of run.chapters) dissolved = Math.max(dissolved, proxies[index].dissolve);
-      const weight = fadeIn * (1 - fadeOut) * (1 - clamp01(dissolved));
+      const dissolved = run.chapters.includes(accessIndex) ? clamp01(pa.dissolve) * (1 - reopen) : 0;
+      const weight = fadeIn * (1 - fadeOut) * (1 - dissolved);
       if (weight <= 0) continue;
       for (const color of run.colors) {
-        visuals.get(run.keys[color]).weight += weight * (run.colors.length > 1 ? choice[color] : 1);
+        const share = weight * (run.colors.length > 1 ? choice[color] : 1);
+        const light = run.variants[color].light || DEFAULT_LIGHT;
+        visuals.get(run.keys[color]).weight += share;
+        floor += share * light.floor;
+        rim += share * light.rim;
       }
     }
-    let floor = 0;
-    let rim = 0;
+    // Two framed photos of the same size cross-fading: the one underneath stays solid, so the
+    // plate dissolves from one picture to the other instead of thinning out to the stage.
+    let lower = null;
+    let upper = null;
+    let fading = 0;
+    for (const entry of visuals.values()) {
+      if (!entry.el || entry.weight <= 0.002 || entry.weight >= 0.998) continue;
+      fading += 1;
+      if (!lower) lower = entry;
+      else upper = entry;
+    }
+    if (
+      fading === 2 &&
+      isFramed(lower.visual) &&
+      isFramed(upper.visual) &&
+      Math.abs(lower.rect.w - upper.rect.w) < 1 &&
+      Math.abs(lower.rect.h - upper.rect.h) < 1 &&
+      Math.abs(lower.weight + upper.weight - 1) < 0.02
+    ) {
+      lower.weight = 1;
+    }
+
     const drawList = [];
     for (const entry of visuals.values()) {
       const w = clamp01(entry.weight);
-      const light = entry.visual.light || { floor: 0.45, rim: 0.3 };
-      floor += w * light.floor;
-      rim += w * light.rim;
       if (entry.el) setAlpha(entry.el, w);
       else if (w > 0.002) drawList.push(entry);
     }
@@ -522,18 +685,13 @@ export function createStage({ story, plan, word, compact, choice: initialChoice 
     }
 
     // Chapter 4: push in on the focal region until it fills the frame.
-    const accessIndex = CHAPTERS.findIndex((ch) => ch.id === 'access');
-    const pa = proxies[accessIndex];
-    const push = clamp01(pa.push);
+    const push = clamp01(pa.push) * (1 - reopen);
     const accessKeys = chapterKeys[accessIndex];
+    let region = null; // where the focal region is on screen right now
     for (const color of accessKeys.colors) {
       const entry = visuals.get(accessKeys.keys[color]);
       const target = entry.el || canvas;
-      if (push <= 0) {
-        setStyle(target, 'transform', 'none');
-        continue;
-      }
-      const f = entry.visual.focal || DEFAULT_FOCAL;
+      const f = accessKeys.variants[color].focal || DEFAULT_FOCAL;
       const r = entry.rect;
       const localX = r.left + f.x * r.w;
       const localY = r.top + f.y * r.h;
@@ -541,23 +699,44 @@ export function createStage({ story, plan, word, compact, choice: initialChoice 
       const screenY = cy + s * (localY - g.rigH / 2);
       const fill = Math.max(g.vw / (f.w * r.w), g.vh / (f.h * r.h)) * 1.02; // scale at which the region covers the viewport
       const zoom = Math.pow(fill / s, push);
+      if (!region) {
+        region = {
+          cx: screenX + push * (g.vw / 2 - screenX),
+          cy: screenY + push * (g.vh / 2 - screenY),
+          w: f.w * r.w * s * zoom,
+          h: f.h * r.h * s * zoom,
+        };
+      }
+      if (push <= 0) {
+        setStyle(target, 'transform', 'none');
+        continue;
+      }
       const dx = (push * (g.vw / 2 - screenX)) / s;
       const dy = (push * (g.vh / 2 - screenY)) / s;
-      const origin = entry.el ? `${(f.x * r.w).toFixed(1)}px ${(f.y * r.h).toFixed(1)}px` : `${localX.toFixed(1)}px ${localY.toFixed(1)}px`;
+      const origin = entry.el
+        ? `${(entry.pad + f.x * r.w).toFixed(1)}px ${(entry.pad + f.y * r.h).toFixed(1)}px`
+        : `${localX.toFixed(1)}px ${localY.toFixed(1)}px`;
       setStyle(target, 'transformOrigin', origin);
       setStyle(target, 'transform', `translate(${dx.toFixed(2)}px, ${dy.toFixed(2)}px) scale(${zoom.toFixed(4)})`);
     }
 
-    // … then the close view takes over at the same framing and settles beside the text.
+    // … then the close view takes over. While it fades in it sits exactly on that region, so
+    // the dissolve is seamless; afterwards it settles into its place beside the text.
     if (detailEl) {
       const settle = clamp01(pa.detail);
-      const out = clamp01(pa.detailOut);
-      const cover = Math.max(g.vw / g.detail.w, g.vh / g.detail.h) * 1.02;
-      const scale = Math.pow(cover, 1 - settle);
-      const tx = (g.vw / 2 - g.detail.cx) * (1 - settle);
-      const ty = (g.vh / 2 - g.detail.cy) * (1 - settle) - out * g.vh * 0.04;
+      // It leaves during the first half of the next chapter's opening; that chapter's own image
+      // arrives in the second half, so the two are never on screen side by side.
+      const out = nextChapter ? clamp01(nextChapter.a / DETAIL_EXIT) : 0;
+      const from = region || { cx: g.vw / 2, cy: g.vh / 2, w: g.vw, h: g.vh };
+      const matched = Math.max(from.w / g.detail.w, from.h / g.detail.h);
+      const scale = Math.pow(matched, 1 - settle);
+      const tx = (from.cx - g.detail.cx) * (1 - settle);
+      const ty = (from.cy - g.detail.cy) * (1 - settle) - out * g.vh * 0.04;
       setAlpha(detailEl, clamp01(pa.detailAlpha) * (1 - out));
       setStyle(detailEl, 'transform', `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0) scale(${scale.toFixed(4)})`);
+      // Its outline and shadow only appear as it comes to rest: while it lies on the pushed-in
+      // picture it must not show as a rectangle.
+      setStyle(detailEl, '--settle', settle.toFixed(2));
     }
   }
 
@@ -584,7 +763,7 @@ export function createStage({ story, plan, word, compact, choice: initialChoice 
       }
     }
     for (const sink of accentSinks) sink.style.removeProperty('--accent');
-    stageEl.remove();
+    stageEl.textContent = '';
   }
 
   return {
@@ -602,6 +781,8 @@ export function createStage({ story, plan, word, compact, choice: initialChoice 
     tick,
     setChoice,
     setFocus: (index) => queue.setFocus(index),
+    loadRest: () => queue.startBackground(),
+    heroReady,
     dispose,
     get proxies() {
       return proxies;

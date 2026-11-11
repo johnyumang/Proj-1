@@ -3,7 +3,7 @@
  * The difference, (reviews), Size guide, Specifications, FAQ, Complete the kit, footer.
  */
 import { html } from './html.js';
-import { arrowIcon, externalLink, mediaUrl, plusIcon } from './parts.js';
+import { arrowIcon, externalLink, plusIcon, rulerLabel } from './parts.js';
 
 function sectionHead({ id, eyebrow, headline, lede }) {
   return html`<header class="section__head">
@@ -73,7 +73,7 @@ function sizeGuide({ content: c, ui }) {
           ([size, inches, cm, best]) => html`<tr><th scope="row">${size}</th><td class="sizes__waist"><span data-unit="in">${inches}</span><span data-unit="cm">${cm}</span></td><td>${best}</td></tr>`,
         )}</tbody>
       </table>
-      <p class="section__more">${externalLink({ label: s.link.text, href: s.link.url, className: 'link link--strong', ui })}</p>
+      <p class="section__more">${externalLink({ label: rulerLabel(s.link.text).text, href: s.link.url, className: 'link link--strong link--icon', ui, icon: rulerLabel(s.link.text).icon })}</p>
     </div>
   </div>
 </section>`;
@@ -156,4 +156,3 @@ export function renderFooter({ content: c, brief, ui, plan }) {
 
 export const renderSections = (ctx) => [difference(ctx), reviewsBand(ctx), sizeGuide(ctx), specifications(ctx), faq(ctx), kit(ctx)];
 
-export { mediaUrl };

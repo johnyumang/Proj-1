@@ -6,7 +6,8 @@
  *
  *   sequence     seq/<chapter>/<color>/0001.webp … exist          → canvas, scrubbed by scroll
  *   still        still/<chapter>/<color>.webp exists               → cut-out still, moved and cross-faded
- *   placeholder  neither exists                                    → framed plate of a real SIIL product photo
+ *   placeholder  neither exists                                    → a real SIIL product photo: cut out of its
+ *                background when the manifest names a "cutout" file for it, otherwise as a framed plate
  *                (or a neutral card with the file name if that photo is missing too)
  *
  * Files on disk decide the mode and the measured numbers (frame count, pixel size, alpha).
@@ -69,7 +70,9 @@ function normalizeFocal(f) {
 export function buildMediaPlan({ publicDir }) {
   const root = path.join(publicDir, MEDIA_BASE);
   const warnings = [];
-  const warn = (msg) => warnings.push(msg);
+  const warn = (msg) => {
+    if (!warnings.includes(msg)) warnings.push(msg);
+  };
   const abs = (rel) => path.join(root, rel);
   const exists = (rel) => fs.existsSync(abs(rel));
 
@@ -87,21 +90,42 @@ export function buildMediaPlan({ publicDir }) {
   const placeholders = manifest.placeholders ?? {};
   const lightFor = (color, entry) => ({ ...DEFAULT_LIGHT, ...(manifest.light?.[color] ?? {}), ...(entry?.light ?? {}) });
 
-  function placeholderVisual(id) {
+  /**
+   * A real SIIL product photo standing in for an own-model image.
+   * `framed: true` always returns the photo itself (the chapter-4 close view is a framed photo).
+   * Otherwise, when the manifest names a "cutout" for the photo (the same picture on the same
+   * canvas with its background removed) and that file is on disk, the cut-out is shown: the
+   * figure then stands on the stage the way an own-model still does.
+   */
+  function placeholderVisual(id, { framed = false } = {}) {
     const def = placeholders[id];
     if (!def || !def.file) {
       warn(`placeholder "${id}" is not defined in manifest.json; a neutral card is shown`);
-      return { key: `ph:${id}`, mode: 'placeholder', missing: true, name: String(id), width: 2, height: 3, alpha: false, alt: null };
+      return { key: `ph:${id}`, id, mode: 'placeholder', missing: true, name: String(id), width: 2, height: 3, alpha: false, cutout: false, alt: null };
     }
     const name = path.basename(def.file);
     if (!exists(def.file)) {
       warn(`placeholder photo is missing: ${def.file}; a neutral card with the file name is shown`);
-      return { key: `ph:${id}`, mode: 'placeholder', missing: true, name, width: def.width || 2, height: def.height || 3, alpha: false, alt: def.alt ?? null };
+      return { key: `ph:${id}`, id, mode: 'placeholder', missing: true, name, width: def.width || 2, height: def.height || 3, alpha: false, cutout: false, alt: def.alt ?? null };
     }
-    const info = imageInfo(abs(def.file));
-    const dir = path.posix.dirname(def.file);
-    const stem = name.replace(/\.[^.]+$/, '');
-    // Smaller copies of the same photo sit next to it as "<name>-w<width>.webp".
+    let shown = def.file;
+    if (!framed && def.cutout) {
+      if (exists(def.cutout)) shown = def.cutout;
+      else warn(`placeholder cut-out is missing: ${def.cutout}; the framed photo is shown instead`);
+    }
+    const cutout = shown !== def.file;
+    const info = imageInfo(abs(shown));
+    if (cutout) {
+      const photo = imageInfo(abs(def.file));
+      if (!info.alpha) warn(`${def.cutout} has no transparency; it is shown as it is`);
+      // Hotspots and the focal region are fractions of the photo, so both files must share one canvas.
+      if (Math.abs(info.width / info.height - photo.width / photo.height) > 0.005) {
+        warn(`${def.cutout} does not have the proportions of ${def.file}; hotspots and the push-in will be off`);
+      }
+    }
+    const dir = path.posix.dirname(shown);
+    const stem = path.basename(shown).replace(/\.[^.]+$/, '');
+    // Smaller copies of the same picture sit next to it as "<name>-w<width>.webp".
     const sources = fs
       .readdirSync(abs(dir))
       .map((f) => {
@@ -110,8 +134,12 @@ export function buildMediaPlan({ publicDir }) {
       })
       .filter(Boolean)
       .sort((a, b) => a.w - b.w);
-    sources.push({ w: info.width, src: def.file });
-    return { key: `ph:${id}`, mode: 'placeholder', missing: false, name, src: def.file, sources, width: info.width, height: info.height, alpha: false, alt: def.alt ?? null };
+    sources.push({ w: info.width, src: shown });
+    return {
+      key: cutout || !framed ? `ph:${id}` : `ph:${id}:framed`,
+      id, mode: 'placeholder', missing: false, name, src: shown, sources,
+      width: info.width, height: info.height, alpha: info.alpha, cutout, alt: def.alt ?? null,
+    };
   }
 
   function resolve(chapterId, color) {
@@ -175,7 +203,10 @@ export function buildMediaPlan({ publicDir }) {
     plan.detail = { key: 'detail:access', mode: 'detail', src: 'detail/access.webp', sources: [{ w: info.width, src: 'detail/access.webp' }], ...info, alt: detailDef.alt ?? null, crop: null };
   } else {
     const access = plan.chapters.access.variants[plan.chapters.access.colors[0]];
-    const ph = detailDef.placeholder?.use ? placeholderVisual(detailDef.placeholder.use) : access.mode === 'placeholder' ? access : null;
+    // The close view is cropped from the very picture chapter 4 pushes in on (cut-out or framed
+    // photo), so the hand-over between the two cannot be seen.
+    const phId = detailDef.placeholder?.use ?? (access.mode === 'placeholder' ? access.id : null);
+    const ph = phId ? placeholderVisual(phId) : null;
     if (ph) {
       const crop = normalizeFocal(detailDef.placeholder?.crop) ?? access.focal ?? { x: 0.5, y: 0.5, w: 0.5, h: 0.5 };
       plan.detail = { ...ph, key: 'detail:placeholder', hotspots: undefined, focal: undefined, light: undefined, crop, alt: detailDef.placeholder?.alt ?? ph.alt };

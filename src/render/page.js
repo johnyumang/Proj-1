@@ -4,7 +4,7 @@
  * finished HTML contains all text and the still images without any JavaScript.
  */
 import { html, jsonScript } from './html.js';
-import { buyButton, colorLabel } from './parts.js';
+import { IMAGE_SIZES, buyButton, colorLabel } from './parts.js';
 import { renderChapters } from './chapters.js';
 import { renderFooter, renderSections } from './sections.js';
 
@@ -22,7 +22,7 @@ function clientPlan(plan) {
   for (const [id, chapter] of Object.entries(plan.chapters)) {
     chapters[id] = { colors: chapter.colors, variants: Object.fromEntries(Object.entries(chapter.variants).map(([c, v]) => [c, slim(v)])) };
   }
-  return { base: plan.base, chapters, detail: slim(plan.detail) };
+  return { base: plan.base, sizes: IMAGE_SIZES, chapters, detail: slim(plan.detail) };
 }
 
 export function renderPage(ctx) {
@@ -43,6 +43,7 @@ export function renderPage(ctx) {
 
 <main id="main">
   <div class="story" data-story>
+    <div class="stage" data-stage aria-hidden="true"></div>
     <div class="chapters">${renderChapters(ctx)}</div>
   </div>
   <div class="light" data-light>${renderSections(ctx)}</div>
@@ -50,10 +51,10 @@ export function renderPage(ctx) {
 
 ${renderFooter(ctx)}
 
-<div class="buybar" data-buybar>
+<aside class="buybar" data-buybar aria-label="${ui.buyBarLabel}">
   ${colorLabel(c, 'buybar__label')}
   ${buyButton({ label: c.sticky.cta, content: c, ui, className: 'btn btn--small buybar__cta' })}
-</div>
+</aside>
 
 <script type="application/json" id="belt-plan">${jsonScript(clientPlan(plan))}</script>
 `.toString();

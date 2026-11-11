@@ -12,14 +12,14 @@ export function initChrome() {
   const light = document.querySelector('[data-light]');
   const footer = document.querySelector('.footer');
   const bar = document.querySelector('[data-buybar]');
-  const second = document.querySelector('[data-chapter="fit"]');
+  const second = document.querySelector('.chapter[data-chapter="fit"]');
   let queued = false;
 
   const update = () => {
     queued = false;
     const vh = window.innerHeight;
     if (nav && light) {
-      nav.classList.toggle('is-light', light.getBoundingClientRect().top <= nav.offsetHeight / 2);
+      nav.classList.toggle('is-light', light.getBoundingClientRect().top <= nav.offsetHeight + 1);
     }
     if (bar && second && footer) {
       // In the pinned story chapter 2 starts when its section reaches the top of the viewport;

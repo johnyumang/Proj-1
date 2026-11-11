@@ -18,6 +18,7 @@ export const ui = {
   newTab: '(opens in a new tab)',
   unitLabel: 'Waist unit',
   reviewsLabel: 'Reviews',
+  buyBarLabel: 'Buy',
   logoAlt: 'SIIL Ostomy',
   missingImage: 'Image not available:',
   // Used only when own-model media has no description in manifest.json (the build warns).
