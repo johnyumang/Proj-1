@@ -3,6 +3,7 @@
 **How to use:** open Claude Code on this repository and paste everything below the line as one message.
 The two design skills it calls for are already in `.claude/skills/` in this repo.
 Facts were captured from `https://www.siilostomy.com/en/ostomy-belt/` on 2026-11-11.
+This is version 2: it was run once, and every point where the first build had to guess is now spelled out. The page it produced is in this repository (`README.md` explains it).
 
 ---
 
@@ -12,12 +13,12 @@ Read sections 1 and 5 before writing any code. They decide what is allowed on th
 
 ## 1. Rules that override everything else
 
-1. **Invent nothing.** Every word of customer-facing copy, every number, every product detail comes from section 4. If a chapter needs a fact that is not in section 4, leave that element out and add a line to `OPEN-QUESTIONS.md`. Do not paraphrase, "improve" or extend the copy. Interface labels such as "Menu", "Close", "Skip to content" and ARIA labels are the only text you may write yourself.
+1. **Invent nothing.** Every word of customer-facing copy, every number, every product detail comes from section 4. If a chapter needs a fact that is not in section 4, leave that element out and add a line to `OPEN-QUESTIONS.md`. Do not paraphrase, "improve" or extend the copy. You may leave a whole sentence out; you may never reword one. The only text you may write yourself: interface labels such as "Menu", "Close", "Skip to content", ARIA labels, and image descriptions that say what is visible and nothing more. A pictograph at the start of a label (the 📏 in two links) is drawn as an icon in the page's own line style; the words stay.
 2. **Nothing from section 5 goes on the page.** Those claims are on the live site but contradict each other or have no source.
-3. **Models are illustrations, never evidence.** The people in the images are SIIL's own generated models. Never caption or alt-text them as customers, "real ostomates", reviewers, nurses or patients, and never place a model image next to a review. Alt text describes what is visible ("Woman in a beige SIIL Ostomy Belt under an open white shirt").
-4. **No medical promises.** No hernia or leak statistics, no "prevents", no "#1", no "best", no competitor names. Keep the post-surgery FAQ answers exactly as written: they send the reader to their stoma care team.
+3. **Models are illustrations, never evidence.** The people in the images are SIIL's own generated models or, until those exist, the people in SIIL's product photos (section 8). Either way, never caption or alt-text them as customers, "real ostomates", reviewers, nurses or patients, and never place a model image next to a review. Alt text describes what is visible ("Woman in a beige SIIL Ostomy Belt under an open white shirt").
+4. **No medical promises.** No hernia or leak statistics, no "prevents", no "#1", no "best", no comparison with a named competitor. Keep the post-surgery FAQ answers exactly as written: they send the reader to their stoma care team. Two things in section 4 look like exceptions and are not: the list of pouch makers in the FAQ states compatibility and stays as written, and the single word "antibacterial" stays where section 4 has it (the longer claims in section 5 do not). Note both in `OPEN-QUESTIONS.md`.
 5. **This is a concept preview.** Add `<meta name="robots" content="noindex,nofollow">` and a small footer line "Concept preview — not the live store". Buying actions open the live page `https://www.siilostomy.com/en/ostomy-belt/` in a new tab.
-6. **Use the skills.** Load `gsap-scrolltrigger` before writing any animation code and `modern-web-design` before designing. Follow their pinning, scrubbing, cleanup, performance and accessibility guidance.
+6. **Use the skills.** Load `gsap-scrolltrigger` before writing any animation code and `modern-web-design` before designing; if the Skill tool does not list them, read `.claude/skills/*/SKILL.md` directly. Follow their scrubbing, cleanup, performance and accessibility guidance. Where a skill disagrees with this prompt, this prompt wins: SplitText is free in GSAP 3.13 and later, body text needs 4.5:1 contrast, and nothing here is pinned with ScrollTrigger (section 3).
 
 ## 2. The reference, reverse-engineered
 
@@ -43,31 +44,39 @@ The reference renders its object in real-time 3D. A garment on a body cannot be 
 
 ## 3. Storyboard
 
-Seven pinned chapters on a dark stage, then four practical sections on a light background. All text keys refer to section 4.
+Seven chapters on a dark stage, then five practical sections on a light background. All text keys refer to section 4.
+
+"Pinned" means this: one stage layer stays fixed for the whole story, and each chapter is a tall section whose text is held in place with CSS `position: sticky`. Do not use ScrollTrigger pins.
 
 | Ch | Reference chapter it mirrors | Stage (model action) | Text | Counter | Accent |
 |---|---|---|---|---|---|
-| 0 Intro | A | Dark. Floor light comes up, model appears wearing the beige belt, giant word **SIIL** reveals behind them, nav fades in. Runs once, about 2.2 s, skippable by scrolling. | — | — | beige |
+| 0 Intro | A | Dark. Floor light comes up, model appears wearing the beige belt together with the hero copy (so the first view can be read at once), giant word **SIIL** reveals behind them letter by letter, nav fades in last. Runs once, about 2.2 s, skippable by scrolling. | `hero.*` | — | beige |
 | 1 Hero | B, D | Model centred, three-quarter view, belt visible. Word SIIL behind. | `hero.*` bottom left; buy button and size-guide link; `hero.specline` bottom right | — | beige |
-| 2 Fit | C, E, H | Model turns from front to side profile. Three hotspots attach to the belt. | `fit.*` | **7** `fit.counter1.unit`, then **55 → 140** `fit.counter2.unit` | ivory |
+| 2 Fit | C, E, H | Model turns from front to side profile. Three hotspots attach to the belt. | `fit.*` | **7** `fit.counter1.unit`, then **55 → 140** `fit.counter2.unit` in the same place (resting value 140) | ivory |
 | 3 Clothes | C, F | Model faces front and lowers their shirt over the belt; the outline stays smooth. | `clothes.*` | — | bronze |
-| 4 Access | I | Push in on the access opening until it fills the frame, then cross-fade to the detail image beside the text and the three-row list. | `access.*` | — | bronze |
+| 4 Access | I | Push in on the access opening until it fills the frame, then cross-fade to the detail image, which settles beside the text and the three-row list. The detail fades in lying exactly on the pushed-in picture, so the hand-over cannot be seen; its outline appears only as it comes to rest. | `access.*` | — | bronze |
 | 5 Pool | G, J | Layout flips. Model in the navy belt at the water, floor light turns blue. | `pool.*` | — | blue |
-| 6 Colors | K | Three stills in the same pose. Swatches switch colour, accent and the label on the buy button. Clicking, not scrolling. | `colors.*` | — | follows choice |
+| 6 Colors | K | Three stills in the same pose. Swatches switch the image, the accent and the label beside the buy button (`sticky.label` with the chosen colour; on phones the sticky bar carries it). Clicking, not scrolling. | `colors.*` | — | follows choice |
 | 7 Close | L | Word SIIL returns, model returns to the hero pose in the chosen colour. | `close.*`, buy button, shipping lines | **30** `close.counter.unit` | follows choice |
 
-Light sections, in this order: **The difference** (comparison table), **Size guide** (cm/inch toggle), **Specifications**, **FAQ** (accordion), **Complete the kit**, footer. A reviews band exists in the layout but renders only if `src/content/reviews.json` has entries; ship that file as an empty array.
+Light sections, in this order: **The difference** (comparison table), **Size guide** (cm/inch toggle), **Specifications**, **FAQ** (accordion), **Complete the kit** (text cards: there are no images or prices for them), footer. A reviews band sits after The difference but renders only if `src/content/reviews.json` has entries; ship that file as an empty array.
+
+Where things lead: the nav link "Why SIIL Belt" goes to chapter 7, the other nav links to their sections. `fit.cta` ("Pick your size") and `hero.secondary` scroll to the size guide on this page. Every other button opens the live product page in a new tab.
 
 Mobile adds a sticky bottom bar with `sticky.label` and `sticky.cta` that appears after chapter 1 and hides over the footer.
 
 ## 4. Verified content (use verbatim)
 
 ```yaml
+brief:                       # the only two strings that are not from the live page
+  word: "SIIL"               # the giant word behind the model
+  preview_note: "Concept preview — not the live store"
+
 meta:
   title: "SIIL Ostomy Belt"
   product_url: "https://www.siilostomy.com/en/ostomy-belt/"
   price: "$76.99"
-  currency_note: "USD, English (US) page"
+  currency_note: "USD, English (US) page"   # for your information; not shown on the page
 
 nav:
   brand: "SIIL Ostomy Belt"
@@ -287,7 +296,7 @@ These are on the live site today. They conflict with each other or have no visib
 
 ## 6. Visual system
 
-Tokens come from the live site's own stylesheet. Belt colours are sampled from the product photos, not guessed.
+Tokens come from the live site's own stylesheet. Belt colours are sampled from the product photos, not guessed. Chapter accents: beige `--belt-beige`, ivory `--ivory`, bronze `--bronze`, blue `--accent-blue`; "follows choice" means beige, `--accent-blue` or `--accent-black`.
 
 ```css
 :root {
@@ -298,9 +307,13 @@ Tokens come from the live site's own stylesheet. Belt colours are sampled from t
   --bronze: #9a7e4f;   /* default accent */
   --muted:  #6b6b6b;
   --accent: var(--bronze);            /* tweened per chapter */
-  --belt-beige: /* eyedrop from the beige belt photo */;
-  --belt-navy:  /* eyedrop from the navy belt photo */;
-  --belt-black: /* eyedrop from the black belt photo */;
+  --belt-beige: #f8cda0;   /* sampled from the fabric in the beige front photo */
+  --belt-navy:  #30375b;   /* sampled from the navy photo */
+  --belt-black: #2f2925;   /* sampled from the black belt in the square photo */
+  /* The navy and black belts are too dark to light a #0f0f0f stage or carry a button, so their
+     accents are lifted. The swatches show the sampled colours above. */
+  --accent-blue:  #8b9ae4; /* same hue as the sampled navy */
+  --accent-black: #d8d2c7; /* warm neutral */
   --font-display: 'Albert Sans', system-ui, sans-serif;      /* 800–900 for the giant word, counters, headlines */
   --font-serif:   'Cormorant Garamond', Georgia, serif;      /* eyebrows and the closing headline, italic */
   --font-body:    'Albert Sans', system-ui, sans-serif;
@@ -310,8 +323,9 @@ Tokens come from the live site's own stylesheet. Belt colours are sampled from t
 - Self-host both fonts with `@fontsource`; no requests to font CDNs.
 - Giant word: `clamp(9rem, 30vw, 34rem)`, weight 900, letter-spacing −0.04em, horizontal gradient from `--ink-2` to `--accent`.
 - Counters: `clamp(5rem, 13vw, 13rem)`, weight 800, `font-variant-numeric: tabular-nums`; unit in small caps beside the last digit.
-- Headlines: `clamp(2rem, 4.2vw, 4.5rem)`, weight 800, line-height 0.98, letter-spacing −0.02em, at most 14 characters wide per line where the copy allows.
+- Headlines: `clamp(2rem, 4.2vw, 4.5rem)`, weight 800, line-height 0.98, letter-spacing −0.02em, `max-width: 13ch` with balanced wrapping.
 - Floor light: a blurred ellipse under the model, `radial-gradient` in `--accent`, 35–55% opacity.
+- Shadow lighting: the figure is lit low-key, the way a product is lit on a dark set. One soft light from high camera-left, the far side of the body falling into shadow, a thin warm rim on the shadow side so the figure never merges with the stage, and the pool of light on the floor. The belt always sits in the light.
 - Skin has to stay rich on the dark stage. If a model's skin or the black belt sinks into the background, raise the floor light and add a soft rim behind the figure. Never lighten the skin itself.
 - Light sections use `--ivory` with `--ink` text, hairline dividers and generous whitespace. The change from dark to light is one clean wipe tied to scroll.
 - Motion: `power3.out` for entrances, `none` for anything scrubbed, 0.6–0.9 s for the few time-based moves. Nothing bounces.
@@ -322,6 +336,7 @@ Tokens come from the live site's own stylesheet. Belt colours are sampled from t
 - `gsap` 3.13 or later with `ScrollTrigger` and `SplitText` (all GSAP plugins are free in that version).
 - Native scrolling. Smoothness comes from `scrub: 0.8`, not from replacing the scroll. Do not add a smooth-scroll library unless a test proves it keeps keyboard, touch and reduced-motion behaviour intact.
 - One `ScrollTrigger` per chapter, each owning one timeline. No ScrollTriggers on tweens nested inside a timeline. Register plugins once. Kill every trigger on teardown and call `ScrollTrigger.refresh()` after fonts and first frames load.
+- Make the stage a pure function of scroll position: each chapter's timeline tweens plain numbers on its own object, and one render function reads all of them and derives the picture (pose, cross-fades, accent, frame). Timelines never touch the stage elements. This is what makes scrolling back, reloading mid-page, resizing and nav jumps come out right.
 - Content lives in `src/content/belt.en.js`, transcribed from section 4. No copy in templates.
 
 ## 8. Images: SIIL's own models
@@ -333,15 +348,17 @@ public/media/belt/
   manifest.json
   seq/<chapter>/<color>/0001.webp …     # frames with transparency, 1080 px tall; optional
   seq/<chapter>/<color>/m/0001.webp …   # 720 px tall set for small screens; optional
-  still/<chapter>/<color>.webp          # one frame with transparency; required per chapter
-  detail/access.webp                    # close view of the access opening
+  still/<chapter>/<color>.webp          # one frame with transparency per chapter, except access
+  detail/access.webp                    # close view of the access opening (a real photograph)
 ```
 
-`manifest.json` lists, per chapter and colour: frame count, pixel size, whether frames have transparency, the focal point for the chapter-4 push-in, and hotspot positions as fractions of the frame with the frame range where each is visible.
+Chapter `access` has no plate of its own: it pushes in on the hero plate and cross-fades to `detail/access.webp`.
 
-- **Sequence mode**: preload the first frame at once and the rest in the background, nearest chapter first. Draw to one canvas, sized for device pixel ratio up to 2. Tween a frame index with `snap` and redraw only when the index changes.
+Files on disk decide which mode a chapter uses. `npm run manifest` measures them (frame count, pixel size, transparency) into `manifest.json`; the manifest carries what cannot be measured: the image descriptions, the focal region for the chapter-4 push-in, hotspot positions as fractions of the frame with the frame range where each is visible, and optional floor and rim light per image.
+
+- **Sequence mode**: preload the first frame at once and the rest in the background, nearest chapter first. Draw to one canvas, sized for device pixel ratio up to 2. Tween a frame index with `snap` and redraw only when the index changes. Below 900 px use the `m/` set. Every frame is kept in memory, so export every second frame of a 4-second clip (50 to 60 frames per chapter); it scrubs just as smoothly.
 - **Still mode** (no sequence for a chapter): show the still and animate it with scale, small translation and cross-fades between chapters. The page must look deliberate in this mode, not broken.
-- **Placeholder mode** (no own-model files yet): download these real SIIL product photos into `public/media/belt/placeholder/` and show them as framed plates that overlap the giant word. Mark each with `data-placeholder` and list them in `README.md` under "Images to replace".
+- **Placeholder mode** (no own-model files yet): download these real SIIL product photos into `public/media/belt/placeholder/`. Cut each one out of its background and light it for the dark stage (section 6, shadow lighting): remove the background with a matting model run locally, apply the lighting as a brightness change only, fade the cropped lower edge, keep the photo's canvas so hotspot and focal positions still fit. Nothing is added to or removed from the person or the belt. Keep this as a script in `scripts/` so it can be repeated. The cut-out stands on the stage in front of the giant word, as an own-model still would. If a cut-out cannot be made, show the photo as a framed plate that overlaps the word. Mark each image with `data-placeholder` and list the photos in `README.md` under "Images to replace". In this mode the storyboard's actions (the turn, the shirt, the water) cannot be shown: the picture holds its pose, travels, scales slightly and cross-fades. Say so in the README.
   - `https://www.siilostomy.com/wp-content/uploads/2025/09/Ostomy-BELT-WOMEN-BEIGE-SIIL-Ostomy-3-scaled.jpg` (beige, front)
   - `https://www.siilostomy.com/wp-content/uploads/2025/09/Ostomy-BELT-WOMEN-BEIGE-SIIL-Ostomy-6-1-scaled.jpg` (beige, access opening)
   - `https://www.siilostomy.com/wp-content/uploads/2023/01/Siilostomy76890-683x1024.jpg` (navy)
@@ -351,8 +368,8 @@ public/media/belt/
 
 ## 9. Quality bar
 
-- **Responsive**: designed at 390, 768, 1280 and 1920 px wide. On small screens the model sits in the upper half and text in the lower half; counters and the giant word scale down but stay bold. No horizontal scroll at any width.
-- **Performance**: first view usable in under 2.5 s on a mid-range phone profile; no layout shift from late fonts or images; animate only `transform`, `opacity` and the canvas; the pinned story holds 60 fps on desktop with no long tasks while scrolling.
+- **Responsive**: designed and checked at 390×844, 768×1024, 1024×768, 1280×720, 1440×900 and 1920×1080. Below 900 px the model sits in the upper half and the text panels of a chapter take turns in the lower half; counters and the giant word scale down but stay bold. From 900 to 1199 px the hero and closing chapters do not have room for three columns: keep the model on the right and show their two text panels one after the other. A viewport too short to hold a chapter (under 560 px tall, or under 620 px below 900 px wide) gets the plain page described under Reduced motion. No horizontal scroll at any width.
+- **Performance**: first view usable in under 2.5 s on a mid-range phone profile (the hero copy and still are in the HTML and show as the intro starts); no layout shift from late fonts or images; while scrolling write only `transform`, `opacity`, the canvas and the one accent custom property; the blur on entering headlines is a cross-fade to a fixed, pre-blurred copy of each line, never an animated filter; the story holds 60 fps on desktop with no long tasks while scrolling.
 - **Reduced motion**: with `prefers-reduced-motion: reduce`, nothing is pinned or scrubbed. Each chapter becomes a normal section with its still image, final counter values and visible text.
 - **Accessibility**: one `h1`; real headings per chapter; all text is real text, never baked into images; visible focus styles; the colour choice is a radio group and the FAQ is built from buttons with `aria-expanded`; contrast at least 4.5:1 for body text on both themes; a skip link; the canvas is `aria-hidden` and every chapter carries an `img`-role description of what the model is doing.
 - **No JavaScript**: the full text and the still images are readable.
@@ -364,7 +381,7 @@ public/media/belt/
 2. Build the static page first: all content, both themes, fully responsive, no animation. Screenshot it at 390 and 1440 px wide and fix what looks wrong.
 3. Add the stage and one chapter end to end (chapter 2 has every mechanic). Get it right, then repeat the pattern for the others.
 4. Add the intro, the colour choice and the dark-to-light wipe.
-5. Test with Playwright against the built `dist/`: capture each chapter at its start, middle and end, at 1440×900 and 390×844; repeat with reduced motion; scroll to the end and back and compare the first frame; fail on any console error. Look at every screenshot yourself and fix overlaps, clipped text, empty frames and anything that reads as a template.
+5. Test with Playwright against the built `dist/`: capture each chapter at 10 %, 50 % and 90 % of its scroll range (at exactly 0 % and 100 % it is mid hand-over), at 1440×900 and 390×844; repeat with reduced motion; scroll to the end and back and compare the first frame; fail on any console error. Look at every screenshot yourself and fix overlaps, clipped text, empty frames and anything that reads as a template.
 6. Check section 1 again against the finished page, line by line.
 
 ## 11. Deliver
@@ -372,4 +389,4 @@ public/media/belt/
 - The site source and a `README.md` covering: how to run and build, how to replace images (the folder contract in section 8), and how the page would move into the WordPress child theme later.
 - `OPEN-QUESTIONS.md` with every item from section 5 and anything else you could not source.
 - `docs/screens/` with the final screenshots from step 5.
-- A short report: what was built, what was checked and how, what is still placeholder.
+- A short report, as your final message: what was built, what was checked and how, what is still placeholder.

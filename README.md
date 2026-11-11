@@ -18,7 +18,12 @@ npm run dev        # development server (Vite prints the URL, usually http://loc
 npm run build      # static site in dist/
 npm run preview    # serves dist/ at http://localhost:4173
 npm run manifest   # after adding or replacing images: measure them into manifest.json
+npm run single     # after a build: pack the page into one file, preview/siil-ostomy-belt-preview.html
 ```
+
+`preview/siil-ostomy-belt-preview.html` is the whole page in a single file (styles, script, fonts
+and pictures embedded). It opens with a double click and can be sent by mail or chat for review.
+It is a review copy: deploy `dist/`, not this file.
 
 `dist/` uses relative URLs only (`base: './'`), so it can be copied into any sub-folder of any
 static host.
@@ -46,6 +51,8 @@ src/
 public/media/belt/         images and manifest.json (see "Replacing the images")
 public/media/brand/        the SIIL logo used in the footer
 docs/screens/              screenshots of every chapter (see "Screenshots and checks")
+docs/video/                a 45-second scroll-through of the page (desktop)
+preview/                   the page as one self-contained HTML file (npm run single)
 OPEN-QUESTIONS.md          claims held back until the owner confirms, and other open points
 ```
 
@@ -161,6 +168,7 @@ the scrub has settled.
 | `reduced-motion-1440x900/`, `reduced-motion-390x844/` | the same scroll positions with `prefers-reduced-motion: reduce`: plain sections, nothing pinned |
 | `tablet-1024x768/` | the middle of each chapter at 1024 × 768, where the hero and closing chapters use their side-by-side arrangement |
 | `more/` | the dark-to-light wipe, the light sections and footer, the navy and black colour choice (desktop and phone) |
+| `highlights/` | the readable frame of each chapter at double resolution, for presenting (desktop 1440 × 900 and phone 390 × 844) |
 
 A `start` frame is taken while the stage is still changing over from the chapter before, so its
 text is only beginning to arrive; that is intended.
