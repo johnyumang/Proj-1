@@ -82,6 +82,18 @@ No jewellery, no tattoos, no logos, no text, no props, no other people.
 
 Check each shadow-lit plate twice: once as generated, once placed on the page background. If the shadow side, dark hair or a black belt disappears into the page, the rim light is too weak; generate again.
 
+### Styling (applies to every sheet after Sheet 1)
+
+The belt is the subject; the clothes frame it and never compete with it.
+
+- **Palette**: bone white, ivory, warm sand, light-wash denim, charcoal. No bright colours, no prints, no logos. The only strong colour in a picture is the belt when it is navy or black.
+- **Fabrics**: linen, cotton, soft knit. Matte, with natural creases. Nothing shiny, nothing sheer over the belt.
+- **Fit**: relaxed and open at the waist so the whole belt shows: an open shirt, a cropped top, trousers worn low. For the "under clothes" picture, one fitted plain T-shirt.
+- **Hair and face**: hair as described for the person, tidy and natural. Skin clean with no visible make-up; no styling that changes skin tone or features.
+- **Hands**: doing something real: holding the shirt aside, resting on the band, smoothing a hem. Never posed in the air.
+- **Mood**: at ease, at home in their body. A small smile or a calm look. Not a fashion pout, not a medical setting.
+- **Per colour**: beige belt with white and denim; navy belt with white or pale blue and off-white; black belt with white or charcoal.
+
 ## 4. Sheets
 
 ### Sheet 1 — Turnaround (creates the person)
