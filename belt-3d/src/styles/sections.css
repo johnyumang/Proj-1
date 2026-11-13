@@ -1,0 +1,100 @@
+/*
+ * Sections, plain presentation (the default: no JS, reduced motion, no WebGL, short viewports).
+ * Every section is a normal block: its field and scene art are a static backdrop, the giant word
+ * sits on top as decoration, the text on calm cards, a still product photo where one exists.
+ * story.css turns the same markup into the fixed stage.
+ */
+.sec { position: relative; isolation: isolate; overflow: clip; }
+.layer.field { position: absolute; inset: 0; z-index: -3; background: var(--field); }
+.art { position: absolute; inset: 0; z-index: -2; overflow: hidden; pointer-events: none; }
+.plane { position: absolute; inset: 0; }
+.art svg { width: 100%; height: 100%; }
+.art--tall { display: none; }
+@media (max-width: 899px) {
+  .art--wide { display: none; }
+  .art--tall { display: block; }
+}
+.ribbon, .belt, .rail, .intro, .buybar, .hs__dot, .hs__line { display: none; }
+
+/* giant word */
+.word { position: relative; z-index: -1; padding: 48px var(--gutter) 0; text-align: center; pointer-events: none; }
+.word__clip { display: block; }
+.word__text {
+  display: block; font-family: var(--font-display); text-transform: uppercase; color: var(--word);
+  font-size: var(--fs, clamp(4.5rem, 17vw, 15rem)); line-height: 0.86; letter-spacing: -0.012em; white-space: nowrap;
+}
+.scene--casual .word__text, .scene--office .word__text { --fs-max: 1; }
+
+/* card: the calm backing for every text block over art */
+.card {
+  position: relative; background: var(--card); color: var(--ink); border-radius: var(--radius);
+  padding: clamp(20px, 2.4vw, 32px); box-shadow: var(--shadow-2); max-width: 480px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.card .num { margin-bottom: 2px; }
+.card__cta { margin-top: 8px; }
+.card--dark { background: var(--dark-card); color: var(--ivory); --acc: var(--bronze-lt); box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35); }
+.card--dark .body { color: #e3d8c7; }
+.card--dark .btn { background: var(--ivory); color: #2a1f17; }
+.card--dark .pill { background: #2f261f; color: var(--ivory); box-shadow: none; }
+
+/* plain layout of a scene section */
+.sec--scene .pin, .sec--access .pin, .sec--hl .pin, .sec--close .pin {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px 48px; align-items: end;
+  padding: 32px var(--gutter) 72px; max-width: 1280px; margin: 0 auto;
+}
+.still { grid-column: 2; grid-row: 1 / span 2; justify-self: center; width: min(100%, 380px); }
+.still img { width: 100%; filter: drop-shadow(0 24px 30px rgba(0, 0, 0, 0.22)); }
+.sec--scene .card { grid-column: 1; }
+.side { grid-column: 1; display: flex; flex-direction: column; gap: 16px; }
+.stats { display: flex; gap: 32px; background: var(--card); border-radius: var(--radius); padding: 18px 24px; box-shadow: var(--shadow-1); width: max-content; max-width: 100%; }
+.stats .stat { align-items: flex-start; }
+/* office: counters and pills say the same thing; the counters lead, the pills appear where they do not fit */
+.pills--alt { display: none; }
+
+/* gate */
+.sec--gate .pin { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 24px; min-height: 60vh; padding: 64px var(--gutter); }
+.gate { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.gate__title { font-family: var(--font-text); font-weight: 800; text-transform: uppercase; letter-spacing: 0.18em; font-size: 1rem; color: var(--pool-acc); }
+.gate__line { font-family: var(--font-display); text-transform: uppercase; font-size: clamp(2.5rem, 1.5rem + 5vw, 6rem); line-height: 0.92; letter-spacing: -0.005em; color: var(--pool-acc); max-width: 14ch; text-wrap: balance; }
+.cue { display: none; }
+
+/* highlights */
+.sec--hl { color: var(--ivory); --acc: var(--bronze-lt); }
+.sec--hl .pin { grid-template-columns: 1fr; align-items: start; }
+.hl__head { display: flex; flex-direction: column; gap: 8px; max-width: 620px; }
+.hl__head .headline { color: var(--ivory); }
+.hl__list { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.hs__card { background: var(--card); color: var(--ink); border-radius: 18px; padding: 18px 20px; box-shadow: var(--shadow-1); display: flex; flex-direction: column; gap: 6px; }
+.hs__n { font-family: var(--font-display); font-size: 1.5rem; line-height: 1; color: var(--bronze); }
+.hs__label { font-size: 1.1875rem; font-weight: 800; letter-spacing: -0.01em; }
+.hs__text { color: var(--ink-2); font-size: 1.0625rem; line-height: 1.5; }
+.hs--zip { display: none; }
+
+/* access */
+.sec--access { color: var(--ivory); }
+.sec--access .card { grid-column: 1 / -1; max-width: 640px; }
+.facts { display: grid; gap: 0; border-top: 1px solid rgba(251, 243, 230, 0.16); }
+.facts__row { display: grid; grid-template-columns: 7.5rem 1fr; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(251, 243, 230, 0.16); }
+.facts dt { font-family: var(--font-serif); font-style: italic; font-weight: 600; font-size: 1.25rem; color: var(--bronze-lt); line-height: 1.2; }
+.facts dd { color: #efe5d5; }
+
+/* close */
+.sec--close { color: var(--ivory); --acc: var(--ivory); }
+.sec--close .pin { grid-template-columns: 1fr; justify-items: center; text-align: center; padding-top: 72px; padding-bottom: 32px; }
+.hole { display: flex; flex-direction: column; align-items: center; gap: 14px; max-width: 560px; }
+.headline--hole { font-family: var(--font-display); font-weight: 400; text-transform: uppercase; letter-spacing: 0; font-size: clamp(2.25rem, 1.4rem + 2.6vw, 3.75rem); line-height: 0.95; color: var(--ivory); }
+.hole .stat { align-items: center; }
+.hole .stat__fig { color: var(--ivory); }
+.close-more { position: relative; padding: 0 var(--gutter) 72px; display: flex; justify-content: center; }
+.close-more__card { background: var(--card); color: var(--ink); border-radius: var(--radius); padding: clamp(24px, 3vw, 40px); max-width: 720px; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-2); --acc: #8f3f22; --acc-ink: #fff; }
+.lines { display: grid; gap: 8px; }
+.lines li { display: flex; gap: 10px; align-items: center; font-weight: 600; }
+.lines .icon { width: 24px; height: 24px; color: #8f3f22; flex: none; }
+
+@media (max-width: 899px) {
+  .sec--scene .pin, .sec--access .pin { grid-template-columns: 1fr; padding-bottom: 48px; }
+  .still { grid-column: 1; grid-row: auto; width: min(80%, 300px); }
+  .word { padding-top: 32px; }
+  .word__text { white-space: normal; font-size: clamp(4rem, 26vw, 9rem); }
+}

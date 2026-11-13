@@ -1,0 +1,48 @@
+/*
+ * Design tokens of the 3D story: every colour of the page lives here.
+ * Text on scene art always sits on a calm card (--card / --card-ink); contrast pairs checked
+ * against WCAG AA (body text >= 4.5:1, large text and UI >= 3:1).
+ */
+:root {
+  --ink: #1f1a17;          /* text on light: 15.6:1 on --card */
+  --ink-2: #3d352e;        /* secondary text on light: 10.6:1 on --card */
+  --card: #fbf7f0;
+  --paper: #f4ede1;        /* shop and library paper */
+  --paper-2: #ebe1d0;
+  --ivory: #fbf3e6;
+  --line: rgba(31, 26, 23, 0.14);
+
+  /* scenes: field, giant word, accent (eyebrow, button), ribbon */
+  --pool-field: #bfe8e4;  --pool-word: #2b97a3;  --pool-acc: #1d3461;  --pool-ribbon: #ffffff;
+  --beach-field: #f7dcc0; --beach-word: #c0582f; --beach-acc: #9a4220;  --beach-ribbon: #fff6ea;
+  --casual-field: #f0e2c6; --casual-word: #c9703f; --casual-acc: #4f5c2d; --casual-ribbon: #fbf3e6;
+  --office-field: #cdd7e0; --office-word: #d0763c; --office-acc: #2c3a4d; --office-ribbon: #fffaf2;
+
+  /* calm fields */
+  --hl-field: #221a15;
+  --access-field: #17120f;
+  --close-field: #b0532e;  /* ivory text on it: 4.6:1 */
+  --bronze: #9a7e4f;
+  --bronze-lt: #d1b07a;    /* on --access-field: 8.9:1 */
+  --dark-card: #231c17;
+
+  --acc: var(--pool-acc);
+  --acc-ink: #ffffff;
+
+  --font-display: 'Anton', 'Anton Fallback', Impact, sans-serif;
+  --font-text: 'Albert Sans', 'Albert Sans Fallback', Arial, sans-serif;
+  --font-serif: 'Cormorant Garamond', 'Cormorant Fallback', 'Times New Roman', serif;
+
+  --radius: 22px;
+  --gutter: clamp(16px, 4vw, 64px);
+  --bar-h: 64px;
+  --buybar-h: 0px;
+  --shadow-1: 0 1px 2px rgba(31, 26, 23, 0.08), 0 8px 24px rgba(31, 26, 23, 0.12);
+  --shadow-2: 0 2px 4px rgba(31, 26, 23, 0.1), 0 24px 48px rgba(31, 26, 23, 0.18);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.scene--pool { --acc: var(--pool-acc); --word: var(--pool-word); }
+.scene--beach { --acc: var(--beach-acc); --word: var(--beach-word); }
+.scene--casual { --acc: var(--casual-acc); --word: var(--casual-word); }
+.scene--office { --acc: var(--office-acc); --word: var(--office-word); }

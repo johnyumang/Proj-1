@@ -5,8 +5,8 @@
  * from the verified product content in src/content/belt.en.js and make no product claim:
  *  - the four giant scene words behind the belt,
  *  - the library heading (the live site's own blog category name) and its address,
- *  - the shop block titles: the three listing card titles, the pack option names and the
- *    "Mesh wash bag" label.
+ *  - the shop block titles: the section title and the three listing card titles
+ *    (pack names, provisional prices and the "Mesh wash bag" label are in ./packs.js).
  * Keep them here (one place to audit), never in templates. See OPEN-QUESTIONS.md part C.
  */
 export const scenes = {
@@ -27,13 +27,7 @@ export const shop = {
     men: 'For men',
     unisex: 'Unisex',
   },
-  packs: {
-    single: 'Single belt',
-    multi: 'Multi-pack',
-    triple: 'Triple pack',
-    upgrade: 'Upgraded: with mesh wash bag',
-  },
-  washBag: 'Mesh wash bag',
+  // Pack names, prices and the "Mesh wash bag" label: ./packs.js
 };
 
 export default scenes;

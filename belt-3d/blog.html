@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex,nofollow">
+    <title><!--title--></title>
+    <link rel="icon" href="data:,">
+    <!--preload-->
+    <link rel="stylesheet" href="/src/styles/blog-page.css">
+    <script>
+      // Cards rise in as they scroll into view, only when motion is welcome and the observer exists.
+      (function (d, w) {
+        var c = d.documentElement.classList;
+        c.remove('no-js');
+        c.add('js');
+        try {
+          if ('IntersectionObserver' in w && !w.matchMedia('(prefers-reduced-motion: reduce)').matches) c.add('can-reveal');
+        } catch (e) {}
+      })(document, window);
+    </script>
+    <script type="module" src="/src/blog.js"></script>
+  </head>
+  <body class="page-blog">
+<!--app-->
+  </body>
+</html>

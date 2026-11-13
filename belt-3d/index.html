@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex,nofollow">
+    <title><!--title--></title>
+    <link rel="icon" href="data:,">
+    <!--preload-->
+    <link rel="stylesheet" href="/src/styles/story-page.css">
+    <script>
+      // Pick the presentation before first paint.
+      //   is-story  fixed stage + sticky text, scrubbed by scroll: WebGL available, no reduced motion,
+      //             a viewport tall enough to hold a chapter, and not ?plain=1
+      //   otherwise the plain page: stacked sections, nothing pinned or scrubbed
+      (function (d, w) {
+        var c = d.documentElement.classList;
+        c.remove('no-js');
+        c.add('js');
+        try {
+          var gl = false;
+          try {
+            var cv = d.createElement('canvas');
+            gl = !!(cv.getContext('webgl2') || cv.getContext('webgl'));
+          } catch (e) {}
+          var story =
+            gl &&
+            !/[?&]plain=1/.test(w.location.search) &&
+            !w.matchMedia('(prefers-reduced-motion: reduce)').matches &&
+            w.matchMedia('(min-width: 900px) and (min-height: 560px), (max-width: 899px) and (min-height: 620px)').matches;
+          if (story) {
+            c.add('is-story');
+            // If the story script has not started within 4 s, fall back to the plain page.
+            w.__storyGuard = setTimeout(function () {
+              if (!w.__storyReady) {
+                w.__storyGaveUp = true;
+                c.remove('is-story', 'is-intro');
+              }
+            }, 4000);
+          }
+        } catch (e) {}
+      })(document, window);
+    </script>
+    <script type="module" src="/src/main.js"></script>
+  </head>
+  <body>
+<!--app-->
+  </body>
+</html>

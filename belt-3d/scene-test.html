@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Belt stage test</title>
+    <!-- Dev-only harness for belt-3d/src/scene. Not part of the build inputs.
+         Every state field can be preset by query parameter, e.g.
+         scene-test.html?view=0&zoom=3&color=1&bg=a9c4e8&accent=faf8f4&panel=0&dots=1&pr=1 -->
+    <style>
+      :root {
+        --bg: #8f8a84;
+      }
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: var(--bg);
+        overflow: hidden;
+        font: 12px/1.3 system-ui, sans-serif;
+      }
+      #stage {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      #dots {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+      }
+      .dot {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        margin: -6px 0 0 -6px;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        box-sizing: border-box;
+      }
+      .dot span {
+        position: absolute;
+        left: 14px;
+        top: -4px;
+        white-space: nowrap;
+        color: #fff;
+        text-shadow: 0 1px 2px #000;
+      }
+      .dot.hidden {
+        opacity: 0.35;
+        border-style: dashed;
+      }
+      #panel {
+        position: fixed;
+        top: 8px;
+        right: 8px;
+        width: 250px;
+        max-height: calc(100% - 16px);
+        overflow: auto;
+        background: rgba(20, 20, 20, 0.78);
+        color: #eee;
+        padding: 8px 10px;
+        border-radius: 8px;
+      }
+      #panel label {
+        display: grid;
+        grid-template-columns: 58px 1fr 44px;
+        align-items: center;
+        gap: 6px;
+        margin: 3px 0;
+      }
+      #panel input[type='range'] {
+        width: 100%;
+      }
+      #panel output {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+      #panel .row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin: 6px 0;
+        flex-wrap: wrap;
+      }
+      #stats {
+        opacity: 0.7;
+        margin-top: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="stage"></canvas>
+    <div id="dots"></div>
+    <div id="panel"></div>
+    <script type="module">
+      import { createStage, DEFAULT_STATE, canRender } from './src/scene/index.js';
+
+      const q = new URLSearchParams(location.search);
+      const ranges = {
+        view: [0, 1, 0.001],
+        zoom: [0.3, 8, 0.01],
+        spin: [-6.3, 6.3, 0.01],
+        tilt: [-0.5, 0.5, 0.005],
+        x: [-0.5, 0.5, 0.005],
+        y: [-0.5, 0.5, 0.005],
+        color: [0, 2, 0.01],
+        open: [0, 1, 0.005],
+        peel: [0, 1, 0.005],
+        form: [0, 1, 0.005],
+        present: [0, 1.2, 0.005],
+        ribbonA: [0, 1, 0.002],
+        ribbonB: [0, 1, 0.002],
+        drift: [0, 1, 0.01],
+        time: [0, 60, 0.01],
+      };
+      const state = { ...DEFAULT_STATE };
+      for (const k of Object.keys(state)) {
+        if (!q.has(k)) continue;
+        const v = q.get(k);
+        state[k] = k === 'accent' ? parseInt(v.replace('#', ''), 16) : Number(v);
+      }
+      if (q.get('spin') === 'pi') state.spin = Math.PI;
+      let bg = '#' + (q.get('bg') || '8f8a84').replace('#', '');
+      document.documentElement.style.setProperty('--bg', bg);
+      const showPanel = q.get('panel') !== '0';
+      let showDots = q.get('dots') === '1';
+
+      const canvas = document.getElementById('stage');
+      const panel = document.getElementById('panel');
+      const dotsEl = document.getElementById('dots');
+      if (!showPanel) panel.style.display = 'none';
+
+      window.__log = [];
+      if (!canRender()) {
+        panel.textContent = 'WebGL not available';
+        throw new Error('no webgl');
+      }
+      const opts = {};
+      if (q.has('pr')) opts.pixelRatio = Number(q.get('pr'));
+      const stage = await createStage(canvas, opts);
+      window.__stage = stage;
+      window.__state = state;
+
+      let frames = 0;
+      const draw = () => {
+        const t0 = performance.now();
+        const drew = stage.apply(state);
+        const dt = performance.now() - t0;
+        if (drew) frames++;
+        stats.textContent = `draws ${frames} · last apply ${dt.toFixed(1)} ms`;
+        updateDots();
+        return drew;
+      };
+      window.__apply = (patch) => {
+        Object.assign(state, patch);
+        syncInputs();
+        return draw();
+      };
+
+      // ---- panel ----
+      const inputs = {};
+      for (const [k, [min, max, step]] of Object.entries(ranges)) {
+        const lab = document.createElement('label');
+        lab.innerHTML = `<span>${k}</span><input type="range" min="${min}" max="${max}" step="${step}"><output></output>`;
+        const inp = lab.querySelector('input');
+        const out = lab.querySelector('output');
+        inp.value = state[k];
+        out.textContent = (+state[k]).toFixed(2);
+        inp.addEventListener('input', () => {
+          state[k] = Number(inp.value);
+          out.textContent = state[k].toFixed(2);
+          draw();
+        });
+        inputs[k] = { inp, out };
+        panel.appendChild(lab);
+      }
+      function syncInputs() {
+        for (const [k, { inp, out }] of Object.entries(inputs)) {
+          inp.value = state[k];
+          out.textContent = (+state[k]).toFixed(2);
+        }
+        accentIn.value = '#' + state.accent.toString(16).padStart(6, '0');
+      }
+      const row = document.createElement('div');
+      row.className = 'row';
+      row.innerHTML = `<label style="display:flex;gap:4px">accent <input type="color" id="accent"></label>
+        <label style="display:flex;gap:4px">bg <input type="color" id="bg"></label>
+        <label style="display:flex;gap:4px"><input type="checkbox" id="dotsToggle"> anchors</label>
+        <label style="display:flex;gap:4px"><input type="checkbox" id="play"> play time</label>`;
+      panel.appendChild(row);
+      const accentIn = row.querySelector('#accent');
+      const bgIn = row.querySelector('#bg');
+      const dotsToggle = row.querySelector('#dotsToggle');
+      const play = row.querySelector('#play');
+      accentIn.value = '#' + state.accent.toString(16).padStart(6, '0');
+      bgIn.value = bg;
+      dotsToggle.checked = showDots;
+      accentIn.addEventListener('input', () => {
+        state.accent = parseInt(accentIn.value.slice(1), 16);
+        draw();
+      });
+      bgIn.addEventListener('input', () => {
+        document.documentElement.style.setProperty('--bg', bgIn.value);
+      });
+      dotsToggle.addEventListener('change', () => {
+        showDots = dotsToggle.checked;
+        updateDots();
+      });
+      const stats = document.createElement('div');
+      stats.id = 'stats';
+      panel.appendChild(stats);
+      const presets = document.createElement('div');
+      presets.className = 'row';
+      presets.innerHTML = '<button data-p="top">top</button><button data-p="hero">hero</button><button data-p="closure">closure</button><button data-p="copy">copy URL</button>';
+      panel.appendChild(presets);
+      presets.addEventListener('click', (e) => {
+        const p = e.target.dataset.p;
+        if (p === 'top') window.__apply({ view: 0, zoom: 1, spin: 0 });
+        if (p === 'hero') window.__apply({ view: 1, zoom: 1, spin: 0 });
+        if (p === 'closure') window.__apply({ view: 1, zoom: 1, spin: 2.2 });
+        if (p === 'copy') {
+          const u = new URL(location.href);
+          for (const k of Object.keys(state)) u.searchParams.set(k, k === 'accent' ? state[k].toString(16) : +(+state[k]).toFixed(4));
+          navigator.clipboard && navigator.clipboard.writeText(u.toString());
+        }
+      });
+
+      // ---- anchor dots ----
+      const names = ['pocket', 'zip', 'fastening', 'label'];
+      const colors = { pocket: '#e33', zip: '#3c3', fastening: '#36f', label: '#fc0' };
+      const dots = {};
+      for (const n of names) {
+        const d = document.createElement('div');
+        d.className = 'dot';
+        d.style.background = colors[n];
+        d.innerHTML = `<span>${n}</span>`;
+        dotsEl.appendChild(d);
+        dots[n] = d;
+      }
+      function updateDots() {
+        dotsEl.style.display = showDots ? '' : 'none';
+        if (!showDots) return;
+        for (const n of names) {
+          const p = stage.project(n);
+          dots[n].style.left = p.x + 'px';
+          dots[n].style.top = p.y + 'px';
+          dots[n].classList.toggle('hidden', !p.visible);
+        }
+      }
+
+      new ResizeObserver(() => {
+        stage.resize();
+        updateDots();
+      }).observe(canvas);
+
+      let t0 = null;
+      const loop = (now) => {
+        if (play.checked) {
+          if (t0 === null) t0 = now / 1000 - state.time;
+          state.time = now / 1000 - t0;
+          inputs.time.inp.value = state.time % 60;
+          draw();
+        } else t0 = null;
+        requestAnimationFrame(loop);
+      };
+      requestAnimationFrame(loop);
+
+      draw();
+      window.__ready = true;
+    </script>
+  </body>
+</html>
