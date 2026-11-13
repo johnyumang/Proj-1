@@ -1,0 +1,196 @@
+{
+  "source": "Product names and URLs verbatim from the live store API (https://www.siilostomy.com/wp-json/wc/store/v1/products), captured 2026-11-13. The German site has no belt landing page in the pages API, so belt_page points at its unisex product.",
+  "default": "en",
+  "languages": [
+    {
+      "code": "en",
+      "flag": "us",
+      "label": "English (US)",
+      "belt_page": "https://www.siilostomy.com/en/ostomy-belt/",
+      "unisex": {
+        "name": "SIIL Ostomy Belt",
+        "url": "https://www.siilostomy.com/en/product/siil-belt/"
+      },
+      "men": {
+        "beige": {
+          "name": "Ostomy Belt for Men – Beige",
+          "url": "https://www.siilostomy.com/en/product/ostomy-belt-beige/"
+        },
+        "navy": {
+          "name": "Ostomy Belt for Men – Navy",
+          "url": "https://www.siilostomy.com/en/product/ostomy-belt-men-navy/"
+        },
+        "black": {
+          "name": "Ostomy Belt for Men – Black",
+          "url": "https://www.siilostomy.com/en/product/ostomy-belt-black/"
+        }
+      },
+      "women": {
+        "beige": {
+          "name": "Ostomy Belt for Women – Beige",
+          "url": "https://www.siilostomy.com/en/product/ostomy-belt-women-beige/"
+        },
+        "navy": {
+          "name": "Ostomy Belt for Women – Navy",
+          "url": "https://www.siilostomy.com/en/product/ostomy-belt-women-navy/"
+        },
+        "black": {
+          "name": "Ostomy Belt for Women – Black",
+          "url": "https://www.siilostomy.com/en/product/siil-ostomy-belt-black/"
+        }
+      }
+    },
+    {
+      "code": "en-gb",
+      "flag": "gb",
+      "label": "English (UK)",
+      "belt_page": "https://www.siilostomy.com/en-gb/stoma-belt/",
+      "unisex": {
+        "name": "Stoma Support Belt SIIL – Secure and Discreet Hold for Ostomy",
+        "url": "https://www.siilostomy.com/en-gb/product/stoma-belt-siil-ostomy/"
+      },
+      "men": {
+        "beige": {
+          "name": "Stoma Belt for Men – Beige",
+          "url": "https://www.siilostomy.com/en-gb/product/stoma-belt-beige/"
+        },
+        "navy": {
+          "name": "Stoma Belt for Men – Navy",
+          "url": "https://www.siilostomy.com/en-gb/product/stoma-belt-men-navy/"
+        },
+        "black": {
+          "name": "Stoma Belt for Men – Black",
+          "url": "https://www.siilostomy.com/en-gb/product/stoma-belt-black/"
+        }
+      },
+      "women": {
+        "beige": {
+          "name": "Stoma Belt for Women – Beige",
+          "url": "https://www.siilostomy.com/en-gb/product/stoma-belt-women-beige/"
+        },
+        "navy": {
+          "name": "Stoma Belt for Women – Navy",
+          "url": "https://www.siilostomy.com/en-gb/product/stoma-belt-women-navy/"
+        },
+        "black": {
+          "name": "Stoma Belt for Women – Black",
+          "url": "https://www.siilostomy.com/en-gb/product/stoma-support-belt-black/"
+        }
+      }
+    },
+    {
+      "code": "es",
+      "flag": "es",
+      "label": "Español",
+      "belt_page": "https://www.siilostomy.com/cinturon-ostomia/",
+      "unisex": {
+        "name": "Cinturón de Ostomía SIIL – Sujeción Segura y Discreta",
+        "url": "https://www.siilostomy.com/product/cinturon-siil-azul/"
+      },
+      "men": {
+        "beige": {
+          "name": "Cinturón de Soporte Ostomía Hombre Beige",
+          "url": "https://www.siilostomy.com/product/cinturon-soporte-hombre-beige/"
+        },
+        "navy": {
+          "name": "Cinturón Ostomía Hombre Azul Marino",
+          "url": "https://www.siilostomy.com/product/cinturon-hombre-azul-marino/"
+        },
+        "black": {
+          "name": "Cinturón Ostomía Hombre Negro",
+          "url": "https://www.siilostomy.com/product/cinturon-ostomia-negro/"
+        }
+      },
+      "women": {
+        "beige": {
+          "name": "Cinturón Ostomía Mujer Beige",
+          "url": "https://www.siilostomy.com/product/cinturon-mujer-beige/"
+        },
+        "navy": {
+          "name": "Cinturón Ostomía Mujer Azul Marino",
+          "url": "https://www.siilostomy.com/product/cinturon-mujer-azul-marino/"
+        },
+        "black": {
+          "name": "Cinturón Ostomía Mujer Negro",
+          "url": "https://www.siilostomy.com/product/siil-ostomy-belt-negro/"
+        }
+      }
+    },
+    {
+      "code": "de",
+      "flag": "de",
+      "label": "Deutsch",
+      "belt_page": "https://www.siilostomy.com/de/product/siil-guertel/",
+      "unisex": {
+        "name": "Stomagürtel SIIL – Sicherer und diskreter Halt",
+        "url": "https://www.siilostomy.com/de/product/siil-guertel/"
+      },
+      "men": {
+        "beige": {
+          "name": "Stoma-Stützgürtel Herren Beige",
+          "url": "https://www.siilostomy.com/de/product/stoma-stuetzguertel-herren-beige/"
+        },
+        "navy": {
+          "name": "Stomagürtel Herren Marineblau",
+          "url": "https://www.siilostomy.com/de/product/stomaguertel-herren-marineblau/"
+        },
+        "black": {
+          "name": "Stomagürtel Herren Schwarz",
+          "url": "https://www.siilostomy.com/de/product/stoma-guertel-schwarz/"
+        }
+      },
+      "women": {
+        "beige": {
+          "name": "Stomagürtel Damen Beige",
+          "url": "https://www.siilostomy.com/de/product/stomaguertel-damen-beige/"
+        },
+        "navy": {
+          "name": "Stomagürtel Damen Marineblau",
+          "url": "https://www.siilostomy.com/de/product/stomaguertel-damen-marineblau/"
+        },
+        "black": {
+          "name": "Stomagürtel Damen Schwarz",
+          "url": "https://www.siilostomy.com/de/product/stomaguertel-schwarz/"
+        }
+      }
+    },
+    {
+      "code": "fr",
+      "flag": "fr",
+      "label": "Français",
+      "belt_page": "https://www.siilostomy.com/fr/ceinture-stomie/",
+      "unisex": {
+        "name": "Ceinture Stomie SIIL – Maintien Sûr et Discret",
+        "url": "https://www.siilostomy.com/fr/product/ceinture-siil/"
+      },
+      "men": {
+        "beige": {
+          "name": "Ceinture de maintien stomie homme beige",
+          "url": "https://www.siilostomy.com/fr/product/ceinture-maintien-stomie-homme-beige/"
+        },
+        "navy": {
+          "name": "Ceinture de stomie homme bleu marine",
+          "url": "https://www.siilostomy.com/fr/product/ceinture-stomie-homme-bleu-marine/"
+        },
+        "black": {
+          "name": "Ceinture de stomie homme noire",
+          "url": "https://www.siilostomy.com/fr/product/ceinture-stomie-noire/"
+        }
+      },
+      "women": {
+        "beige": {
+          "name": "Ceinture de stomie femme beige",
+          "url": "https://www.siilostomy.com/fr/product/ceinture-stomie-femme-beige/"
+        },
+        "navy": {
+          "name": "Ceinture de stomie femme bleu marine",
+          "url": "https://www.siilostomy.com/fr/product/ceinture-stomie-femme-bleu-marine/"
+        },
+        "black": {
+          "name": "Ceinture de stomie femme noire",
+          "url": "https://www.siilostomy.com/fr/product/ceinture-de-stomie-noire/"
+        }
+      }
+    }
+  ]
+}
