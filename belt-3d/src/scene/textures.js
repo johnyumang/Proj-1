@@ -239,7 +239,7 @@ export function shadowTexture() {
       const a = Math.max(0, 1 - r);
       const k = (y * S + x) * 4;
       d[k] = d[k + 1] = d[k + 2] = 255;
-      d[k + 3] = Math.round(255 * Math.pow(a, 1.8));
+      d[k + 3] = Math.round(255 * Math.exp(-3.2 * r * r) * Math.min(1, a * 3));
     }
   }
   return dataTexture(S, S, d);

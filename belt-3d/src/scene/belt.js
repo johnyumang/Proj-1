@@ -26,6 +26,10 @@ import {
   bottomY,
   bandY,
   dvForDy,
+  vOfY,
+  seamY,
+  SEAM,
+  topY,
   zipY,
   offsetPoint,
   sectionNormal,
@@ -120,7 +124,7 @@ export function createBelt() {
     sheen: 0.6,
     sheenRoughness: 0.5,
     normalMap: knit,
-    normalScale: new Vector2(0.22, 0.22),
+    normalScale: new Vector2(0.42, 0.42),
   };
   const mOuter = keep(new MeshPhysicalMaterial({ ...fabricParams, side: DoubleSide }));
   fabricHook(mOuter, 'belt-outer', 0.62);
@@ -202,8 +206,8 @@ export function createBelt() {
   };
 
   const thOf = (a) => -PI + 2 * PI * a;
-  const UREP = 84; // knit tiles round the waist
-  const VREP = 18; // knit tiles across the height
+  const UREP = 70; // knit tiles round the waist
+  const VREP = 15; // knit tiles across the height
 
   // ---------- outer face: two grids split at the access zip ----------
   let open = 0;
@@ -243,8 +247,8 @@ export function createBelt() {
 
   // ---------- binding round the top and bottom edges ----------
   const makeBinding = (top) => {
-    const r = TH / 2 + 0.009;
-    const bw = top ? 0.045 : 0.04;
+    const r = TH / 2 + 0.013; // soft rolled binding
+    const bw = top ? 0.03 : 0.028;
     const mid = [0, 0, 0];
     const pA = [0, 0, 0];
     const pB = [0, 0, 0];
@@ -362,8 +366,24 @@ export function createBelt() {
   }
   placeSlider();
 
+  // ---------- seam where the front apron is sewn to the band (a soft raised welt) ----------
+  const seamP = (t, out) => {
+    const th = lerp(SEAM.th0, SEAM.th1, t);
+    const y = seamY(th);
+    const v = vOfY(th, y);
+    outerPoint(th, v, v >= VZ ? 1 : -1, open, out);
+    sectionNormal(th, out[1], n);
+    out[0] += n[0] * 0.002;
+    out[2] += n[2] * 0.002;
+    return out;
+  };
+  const seamR = (t, out) => outward(lerp(SEAM.th0, SEAM.th1, t), -0.3, out);
+  const seam = makeTube(seamP, seamR, 160, 5, 0.0042, false);
+  const mSeam = keep(new MeshPhysicalMaterial({ ...fabricParams, normalMap: null, roughness: 0.9 }));
+  mesh(seam.geometry, mSeam, 'seam');
+
   // ---------- woven label, upper front on the wearer's left ----------
-  const LAB = { th: 0.52, y: TOP - 0.13, w: 0.25, h: 0.09 };
+  const LAB = { th: 0.52, y: TOP - 0.135, w: 0.25, h: 0.09 };
   const labR = arcRadius(LAB.th, LAB.y);
   const labelF = (a, b, out) => {
     const th = LAB.th + ((a - 0.5) * LAB.w) / labR;
@@ -566,6 +586,7 @@ export function createBelt() {
     open = o;
     outerLo.update(lowerF, zi0, zi1, 0, 10);
     outerHi.update(upperF, zi0, zi1, 0, zjHi);
+    seam.update(seamP, seamR);
     zipLo.update(zipLoF);
     zipHi.update(zipHiF);
     placeSlider();
@@ -587,12 +608,13 @@ export function createBelt() {
     blend(PAL.pad, c, mPad.color);
     blend(PAL.hook, c, mHook.color);
     hookUniforms.uMargin.value.copy(fabric).multiplyScalar(0.92);
-    RIM.uRim.value.setRGB(1.0, 0.78, 0.55).multiplyScalar(lerp(0.05, 0.28, dark));
+    RIM.uRim.value.setRGB(1.0, 0.78, 0.55).multiplyScalar(lerp(0.03, 0.16, dark));
     // soft sheen keeps the dark knits readable: stronger and lighter on navy/black
+    mSeam.color.copy(fabric).multiplyScalar(0.8);
     mInner.sheen = 0.2;
     mInner.sheenColor.copy(mInner.color);
     for (const m of [mOuter, mTabTop, mBinding]) {
-      m.sheen = lerp(0.35, 0.7, dark);
+      m.sheen = lerp(0.2, 0.45, dark);
       m.sheenColor.copy(m.color).lerp(white, lerp(0.25, 0.2, dark));
       m.sheenRoughness = lerp(0.55, 0.42, dark);
     }
@@ -605,7 +627,7 @@ export function createBelt() {
     let off = OUTER;
     if (name === 'pocket') {
       th = 0;
-      y = lerp(bottomY(0), TOP, 0.55);
+      y = lerp(bottomY(0), topY(0), 0.55);
     } else if (name === 'zip') {
       th = 0;
       y = zipY(0);
@@ -638,65 +660,52 @@ export function createBelt() {
   };
 }
 
-// ---------- torso form: abstract, featureless display-form section of the waist ----------
-export const FORM_TOP = 1.0;
-export const FORM_BOTTOM = -1.42;
+// ---------- torso form: abstract waist form continuing the belt's own surface ----------
+export const FORM_TOP = 1.35;
+export const FORM_BOTTOM = -1.8;
+const FORM_FADE = 0.5;
 
 export function createForm() {
   const group = new Group();
   group.name = 'form';
-  const mat = new MeshStandardMaterial({ color: 0xd9d3ca, roughness: 0.9, metalness: 0 });
-  const BEV = 0.07;
-  const INSET = 0.004;
-  const yOf = (b) => {
-    const bb = clamp(b, -0.02, 1.02);
-    return lerp(FORM_BOTTOM, FORM_TOP, bb - (Math.sin(2 * PI * bb) / (2 * PI)) * 0.85);
+  // a quiet cool neutral: clearly not skin and not fabric
+  const mat = new MeshStandardMaterial({
+    color: 0xb9bcb8,
+    roughness: 1,
+    metalness: 0,
+    transparent: true,
+    depthWrite: true,
+  });
+  const fade = { uFadeY: { value: new Vector2(FORM_BOTTOM, FORM_TOP) } };
+  mat.onBeforeCompile = (sh) => {
+    sh.uniforms.uFadeY = fade.uFadeY;
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying float vFormY;')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvFormY = position.y;');
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <common>', '#include <common>\nvarying float vFormY;\nuniform vec2 uFadeY;')
+      .replace(
+        '#include <alphamap_fragment>',
+        `#include <alphamap_fragment>
+        diffuseColor.a *= smoothstep(uFadeY.x, uFadeY.x + ${FORM_FADE.toFixed(2)}, vFormY)
+          * smoothstep(uFadeY.y, uFadeY.y - ${FORM_FADE.toFixed(2)}, vFormY);`,
+      );
   };
-  const insetAt = (y) => {
-    const de = clamp(Math.min(y - FORM_BOTTOM, FORM_TOP - y), 0, BEV);
-    return BEV - Math.sqrt(Math.max(0, BEV * BEV - (BEV - de) ** 2));
-  };
-  const n = [0, 0, 0];
+  mat.customProgramCacheKey = () => 'belt-form';
   const sideF = (a, b, out) => {
     const th = -PI + 2 * PI * a;
-    const y = yOf(b);
-    const yc = clamp(y, FORM_BOTTOM, FORM_TOP);
-    bodyPoint(th, yc, out);
-    sectionNormal(th, yc, n);
-    const d = -INSET - insetAt(yc);
-    out[0] += n[0] * d;
-    out[2] += n[2] * d;
-    return out;
+    return bodyPoint(th, lerp(FORM_BOTTOM, FORM_TOP, b), out);
   };
-  const sideRef = (a, b, out) => {
-    const th = -PI + 2 * PI * a;
-    sectionNormal(th, clamp(yOf(b), FORM_BOTTOM, FORM_TOP), out);
-    return out;
-  };
-  const side = makeGrid(96, 40, sideF, sideRef);
-  const capF = (yy) => (a, b, out) => {
-    const th = -PI + 2 * PI * a;
-    bodyPoint(th, yy, out);
-    sectionNormal(th, yy, n);
-    const d = -INSET - BEV;
-    const x = out[0] + n[0] * d;
-    const z = out[2] + n[2] * d;
-    const bb = clamp(b, 0, 1);
-    out[0] = x * bb;
-    out[1] = yy;
-    out[2] = z * bb;
-    return out;
-  };
-  const capTop = makeGrid(96, 4, capF(FORM_TOP), (a, b, o) => ((o[0] = 0), (o[1] = 1), (o[2] = 0), o));
-  const capBot = makeGrid(96, 4, capF(FORM_BOTTOM), (a, b, o) => ((o[0] = 0), (o[1] = -1), (o[2] = 0), o));
-  for (const g of [side.geometry, capTop.geometry, capBot.geometry]) group.add(new Mesh(g, mat));
+  const sideRef = (a, b, out) => sectionNormal(-PI + 2 * PI * a, lerp(FORM_BOTTOM, FORM_TOP, b), out);
+  const side = makeGrid(120, 48, sideF, sideRef);
+  const m = new Mesh(side.geometry, mat);
+  m.renderOrder = 1;
+  group.add(m);
   return {
     group,
     material: mat,
     dispose() {
       side.geometry.dispose();
-      capTop.geometry.dispose();
-      capBot.geometry.dispose();
       mat.dispose();
     },
   };

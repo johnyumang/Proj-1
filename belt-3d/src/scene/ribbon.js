@@ -15,8 +15,8 @@ export function createRibbon() {
   ];
   // helix round the belt: back-left -> right side -> front (slanting down to the wearer's right) ->
   // left side -> back -> out right
-  const RX = 1.42;
-  const RZ = 1.2;
+  const RX = 1.34;
+  const RZ = 1.0;
   const a0 = Math.PI * 1.2;
   const a1 = -Math.PI * 1.2;
   const steps = 40;

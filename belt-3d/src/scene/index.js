@@ -64,7 +64,7 @@ import {
   WebGLRenderer,
 } from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
-import { createBelt, createForm, FORM_BOTTOM } from './belt.js';
+import { createBelt, createForm } from './belt.js';
 import { createRibbon } from './ribbon.js';
 import { createDrift } from './drift.js';
 import { shadowTexture } from './textures.js';
@@ -102,16 +102,16 @@ export function canRender() {
 }
 
 // ---- framing constants (belt-local units) ----
-const FOV = 30; // hero view
+const FOV = 22; // hero view: a longer lens, so the belt is seen as worn, not looked into
 const FOV_TOP = 58; // view 0: wider so the inside walls of the ring read as a loop of fabric
 const tanOf = (fov) => Math.tan(((fov / 2) * Math.PI) / 180);
 const TAN = tanOf(FOV);
 const BELT_LOW = bottomY(BULGE_C) - 0.04; // lowest point incl. binding
 const HERO_H = TOP + 0.04 - BELT_LOW; // visual height of the belt in the hero view
 const HERO_CY = (TOP + BELT_LOW) / 2;
-const HERO_W = 2.3; // visual width incl. hip flare and binding
+const HERO_W = 2.4; // visual width incl. hip flare and binding
 const RING_W = 2.2; // ring size seen from above
-const HERO_ELEV = 0.2; // radians above waist height in view 1
+const HERO_ELEV = 0.035; // view 1: camera level with the middle of the band (~2 degrees)
 
 function num(v, d) {
   const n = typeof v === 'number' ? v : Number(v);
@@ -155,18 +155,18 @@ export async function createStage(canvas, options = {}) {
     if (envRT) envRT.dispose();
     envRT = pmrem.fromScene(room, 0.04);
     scene.environment = envRT.texture;
-    scene.environmentIntensity = 0.24;
+    scene.environmentIntensity = 0.42;
   }
   buildEnv();
 
   // lights: soft key, gentle fill, warm rim
-  const key = new DirectionalLight(0xffffff, 2.9);
+  const key = new DirectionalLight(0xffffff, 2.3);
   key.position.set(-5, 3.6, 3.2);
-  const fill = new DirectionalLight(0xeef2ff, 0.4);
+  const fill = new DirectionalLight(0xeef2ff, 0.6);
   fill.position.set(4.5, 0.6, 3.5);
-  const rim = new DirectionalLight(0xffcf9c, 3.4);
+  const rim = new DirectionalLight(0xffcf9c, 2.2);
   rim.position.set(3.5, 2.5, -5);
-  const rim2 = new DirectionalLight(0xffd8b0, 2.2);
+  const rim2 = new DirectionalLight(0xffd8b0, 1.4);
   rim2.position.set(-4.5, 1.2, -3.5);
   scene.add(key, fill, rim, rim2);
 
@@ -240,7 +240,7 @@ export async function createStage(canvas, options = {}) {
     const push = Math.pow(smoothstep(1, 6, zoom), 2);
     const dist0 = d0 / zoom - (d0 / 6 + 1.05) * push;
     // view 1: belt ~46% of the height, never wider than ~86% of the width
-    const d1 = Math.max(HERO_H / (0.46 * 2 * TAN) + 0.85, HERO_W / (0.86 * 2 * TAN * aspect) + 0.2);
+    const d1 = Math.max(HERO_H / (0.47 * 2 * TAN) + 0.55, HERO_W / (0.86 * 2 * TAN * aspect) + 0.2);
     const dist1 = d1 / zoom;
     const dist = lerp(dist0, dist1, e);
     const phi = lerp(Math.PI / 2, HERO_ELEV, e);
@@ -307,19 +307,15 @@ export async function createStage(canvas, options = {}) {
     const f = clamp(s.form, 0, 1);
     form.group.visible = f > 0.001;
     form.group.scale.setScalar(lerp(0.93, 1, f));
-    const ft = f < 0.999;
-    if (form.material.transparent !== ft) {
-      form.material.transparent = ft;
-      form.material.needsUpdate = true;
-    }
-    form.material.opacity = f;
+    form.material.opacity = f; // always blended: its ends fade out
 
     // contact shadow (view 1 only, fades when the belt leaves)
-    const sh = 0.38 * smoothstep(0.35, 0.9, e) * present * present;
+    // soft, wide and faint; gone when the belt is worn on the form
+    const sh = 0.2 * smoothstep(0.35, 0.9, e) * present * present * (1 - f);
     shadow.visible = sh > 0.002;
     shadowMat.opacity = Math.min(1, sh);
-    shadow.position.set(0, lerp(BELT_LOW - 0.03, FORM_BOTTOM - 0.01, f), 0.05);
-    shadow.scale.set(lerp(3.0, 3.3, f), lerp(2.4, 2.6, f), 1);
+    shadow.position.set(0, BELT_LOW - 0.05, 0.05);
+    shadow.scale.set(4.4, 3.2, 1);
 
     // ribbon
     const rk = smoothstep(0.5, 0.62, s.view);
