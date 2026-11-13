@@ -16,12 +16,14 @@ Kapag walang video ang isang episode o tumanggi ang Facebook, **pula ang run** a
 
 ## Isang beses na set-up
 
-### A. Facebook (mga 15 minuto)
-1. Sa developers.facebook.com, gumawa ng app (My Apps → Create app) na may kakayahang mag-manage ng Page.
-2. Sa Graph API Explorer, piliin ang app, piliin ang **Get Page Access Token**, piliin ang page na History Indio, at idagdag ang mga permission: `pages_show_list`, `pages_read_engagement`, `pages_manage_posts`, `pages_manage_engagement`.
-3. Gawing pangmatagalan ang token: sa Access Token Debugger, i-**Extend** ang user token; gamit iyon, tawagin ang `me/accounts` sa Explorer at kopyahin ang `access_token` ng page. Dapat "Expires: Never" ito sa Debugger.
-4. Ilipat ang app sa **Live** mode (kailangan ng privacy policy URL). Sa Development mode, mga may role lang sa app ang nakakakita ng post.
-5. Kunin ang Page ID (Page → About → Page transparency, o ang `id` sa `me/accounts`).
+### A. Facebook token (sa Business settings, hindi nag-e-expire)
+1. Sa developers.facebook.com, gumawa ng app (My Apps → Create app, uri: Business) at ikabit ito sa business portfolio mo. Ilipat ito sa **Live** mode (kailangan ng privacy policy URL); sa Development mode, mga may role lang sa app ang nakakakita ng post.
+2. Sa business.facebook.com/settings → **Users → System users** → **Add**: pangalan `indio-poster`, role **Admin**.
+3. Piliin ang system user → **Assign assets** → **Pages** → History Indio → **Full control**. Idagdag din ang app sa ilalim ng **Apps** (Full control).
+4. **Generate token** → piliin ang app → expiration **Never** → mga permission: `pages_show_list`, `pages_read_engagement`, `pages_manage_posts`, `pages_manage_engagement` → Generate. Kopyahin agad; minsan lang ito ipinapakita.
+5. Kunin ang Page ID: Business settings → Accounts → Pages → History Indio (ang numero sa ilalim ng pangalan).
+
+Ang token ng system user ay kusang ipinagpapalit ng script sa Page token, kaya iyon na mismo ang ilalagay sa `FB_PAGE_TOKEN`.
 
 ### B. GitHub
 1. Settings → Secrets and variables → Actions → **New repository secret**: `FB_PAGE_ID` at `FB_PAGE_TOKEN`. Huwag ilagay ang token saanman maliban dito.

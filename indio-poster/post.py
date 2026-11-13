@@ -95,16 +95,22 @@ def comment(token, video_id, message):
         raise RuntimeError(fb_error(r))
 
 
-def check(page, token):
+def page_token(page, token):
+    """Accepts a Page token, or a user / system-user token that manages the Page, and returns a Page token."""
     import requests
     r = requests.get(api(GRAPH, "me"), params={"fields": "id,name", "access_token": token}, timeout=60)
     if r.status_code != 200:
         sys.exit("Token check failed. " + fb_error(r))
     me = r.json()
-    print(f"Token belongs to: {me.get('name')} (id {me.get('id')})")
-    if str(me.get("id")) != str(page):
-        sys.exit("This is not a Page token for FB_PAGE_ID. Make a PAGE access token, not a user token.")
-    print("OK: Page token matches FB_PAGE_ID.")
+    if str(me.get("id")) == str(page):
+        print(f"Page token for: {me.get('name')}")
+        return token
+    r = requests.get(api(GRAPH, str(page)), params={"fields": "name,access_token", "access_token": token}, timeout=60)
+    if r.status_code != 200 or "access_token" not in r.json():
+        sys.exit(f"The token belongs to '{me.get('name')}' and cannot get a Page token for FB_PAGE_ID. "
+                 "Give it the Page (full control) and the pages_* permissions. " + (fb_error(r) if r.status_code != 200 else ""))
+    print(f"Token of '{me.get('name')}' exchanged for the Page token of: {r.json().get('name')}")
+    return r.json()["access_token"]
 
 
 def reschedule(start):
@@ -129,8 +135,10 @@ def main():
     mode = os.environ.get("POST_MODE", "schedule")
     if not dry and not (page and token):
         sys.exit("Missing FB_PAGE_ID or FB_PAGE_TOKEN (repository secrets).")
+    if not dry:
+        token = page_token(page, token)
     if cmd == "check":
-        return check(page, token)
+        return print("OK: ready to post to this Page.")
     if not base:
         sys.exit("Missing VIDEO_BASE_URL.")
 
