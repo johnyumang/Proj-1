@@ -1,0 +1,50 @@
+name: INDIO auto-post
+
+on:
+  schedule:
+    # Every 3 hours: hands the next day's episodes to Facebook, which releases them at 7 PM and 11 PM PH.
+    - cron: "17 */3 * * *"
+    # Just before each slot (6:45 PM and 10:45 PM PH): safety net, and the timer for POST_MODE=now.
+    - cron: "45 10,14 * * *"
+  workflow_dispatch:
+    inputs:
+      command:
+        description: "check = test the token only, dry-run = show what would be posted, run = post"
+        type: choice
+        options: [check, dry-run, run]
+        default: check
+
+permissions:
+  contents: write
+
+concurrency:
+  group: indio-post
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install --quiet requests
+      - name: Post
+        env:
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
+          VIDEO_BASE_URL: ${{ vars.VIDEO_BASE_URL || format('https://github.com/{0}/releases/download/indio-videos', github.repository) }}
+          POST_MODE: ${{ vars.POST_MODE || 'schedule' }}
+          FB_API_VERSION: ${{ vars.FB_API_VERSION }}
+        run: python indio-poster/post.py "${{ inputs.command || 'run' }}"
+      - name: Save the posting log
+        if: always()
+        run: |
+          git config user.name "indio-poster"
+          git config user.email "indio-poster@users.noreply.github.com"
+          git add indio-poster/state/posted.json
+          git diff --cached --quiet && exit 0
+          git commit -m "INDIO poster: update posting log"
+          for i in 1 2 3; do git pull --rebase && git push && exit 0; sleep 5; done; exit 1

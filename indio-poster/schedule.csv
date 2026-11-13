@@ -1,0 +1,51 @@
+﻿episode,season,pamagat,petsa,araw,oras_PH,timezone,folder_sa_repo,status
+1,1,Ang Unang Talon,2026-11-14,Sab,19:00,Asia/Manila,ep01-ang-unang-talon,pending
+2,1,British sa Maynila (1762),2026-11-14,Sab,23:00,Asia/Manila,ep02-british-sa-maynila,pending
+3,1,"Ang Sabi ni Lola (Kawit, 1898)",2026-11-15,Lin,19:00,Asia/Manila,ep03-ang-sabi-ni-lola,pending
+4,1,"Ang Aso ni Pepe (Calamba, 1869)",2026-11-15,Lin,23:00,Asia/Manila,ep04-ang-aso-ni-pepe,pending
+5,1,"Binili Tayo sa Halagang $20 Milyon (Treaty of Paris, 1898)",2026-11-16,Lun,19:00,Asia/Manila,ep05-dalawampung-milyon,pending
+6,1,"Ang Huling Umaga (Bagumbayan, 1896)",2026-11-16,Lun,23:00,Asia/Manila,ep06-ang-huling-umaga,pending
+7,1,"Ang Sulat ni Lolo (Paco, 1896–1898)",2026-11-17,Mar,19:00,Asia/Manila,ep07-ang-sulat-ni-lolo,pending
+8,1,"Ang Huling Tala (Kawit, 12 June 1898)",2026-11-17,Mar,23:00,Asia/Manila,ep08-ang-huling-tala,pending
+9,2,"Limang Tinapay (Galilee, the feeding of the five thousand)",2026-11-18,Miy,19:00,Asia/Manila,ep09-limang-tinapay,pending
+10,2,"Batang Indio (Quezon City, about 2012)",2026-11-18,Miy,23:00,Asia/Manila,ep10-batang-indio,pending
+11,2,Ang Sugo ng Butuan,2026-11-19,Huw,19:00,Asia/Manila,ep11-ang-sugo-ng-butuan,pending
+12,2,Ang Kasulatang Tanso,2026-11-19,Huw,23:00,Asia/Manila,ep12-ang-kasulatang-tanso,pending
+13,2,Ang Unang Misa,2026-11-20,Biy,19:00,Asia/Manila,ep13-ang-unang-misa,pending
+14,2,Ang Kuta sa Bunganga ng Ilog,2026-11-20,Biy,23:00,Asia/Manila,ep14-ang-kuta-sa-bunganga-ng-ilog,pending
+15,2,Ang Haring Inilibing sa Tsina,2026-11-21,Sab,19:00,Asia/Manila,ep15-ang-haring-inilibing-sa-tsina,pending
+16,2,Ang Tapayan ng Luzon,2026-11-21,Sab,23:00,Asia/Manila,ep16-ang-tapayan-ng-luzon,pending
+17,2,Ang Dinambong,2026-11-22,Lin,19:00,Asia/Manila,ep17-ang-dinambong,pending
+18,2,Ang Unang Galeon,2026-11-22,Lin,23:00,Asia/Manila,ep18-ang-unang-galeon,pending
+19,2,Ang Tinig,2026-11-23,Lun,19:00,Asia/Manila,ep19-ang-tinig,pending
+20,2,Ang Sariling Dagat,2026-11-23,Lun,23:00,Asia/Manila,ep20-ang-sariling-dagat,pending
+21,3,Ang Lungsod na Walang Anino,2026-11-24,Mar,19:00,Asia/Manila,ep21-ang-lungsod-na-walang-anino,pending
+22,3,Ang Toreng Hindi Natapos,2026-11-24,Mar,23:00,Asia/Manila,ep22-ang-toreng-hindi-natapos,pending
+23,3,Ang mga Bantay sa Hermon,2026-11-25,Miy,19:00,Asia/Manila,ep23-ang-mga-bantay-sa-hermon,pending
+24,3,Ang Reyna ng Lungsod na Lumubog,2026-11-25,Miy,23:00,Asia/Manila,ep24-ang-reyna-ng-lungsod-na-lumubog,pending
+25,3,Ang Orasan sa Ilalim ng Mundo,2026-11-26,Huw,19:00,Asia/Manila,ep25-ang-orasan-sa-ilalim-ng-mundo,pending
+26,3,Ang Baging ng mga Kaluluwa,2026-11-26,Huw,23:00,Asia/Manila,ep26-ang-baging-ng-mga-kaluluwa,pending
+27,3,Bumukas ang Biringan,2026-11-27,Biy,19:00,Asia/Manila,ep27-ang-lungsod-na-walang-anino,pending
+28,3,Ang Bundok ng mga Puwesto,2026-11-27,Biy,23:00,Asia/Manila,ep28-ang-bundok-ng-mga-puwesto,pending
+29,3,Ang Unang Apat na Lalim,2026-11-28,Sab,19:00,Asia/Manila,ep29-ang-unang-apat-na-lalim,pending
+30,3,Ang Talim sa Yelo,2026-11-28,Sab,23:00,Asia/Manila,ep30-ang-talim-sa-yelo,pending
+31,3,Ang Pader sa Papel,2026-11-29,Lin,19:00,Asia/Manila,ep31-ang-pader-sa-papel,pending
+32,4,Ang Kapitan,2026-11-29,Lin,23:00,Asia/Manila,ep32-ang-kapitan,pending
+33,4,Ang Bayan,2026-11-30,Lun,19:00,Asia/Manila,ep33-ang-bayan,pending
+34,4,Ang Senado,2026-11-30,Lun,23:00,Asia/Manila,ep34-ang-senado,pending
+35,4,Ang Bitag,2026-12-01,Mar,19:00,Asia/Manila,ep35-ang-bitag,pending
+36,4,Ang Paglayo,2026-12-01,Mar,23:00,Asia/Manila,ep36-ang-paglayo,pending
+37,4,Saksi Ako,2026-12-02,Miy,19:00,Asia/Manila,ep37-saksi-ako,pending
+38,4,Ang Limampu,2026-12-02,Miy,23:00,Asia/Manila,ep38-ang-limampu,pending
+39,4,Ang Sugo,2026-12-03,Huw,19:00,Asia/Manila,ep39-ang-sugo,pending
+40,4,Ang mga Arko,2026-12-03,Huw,23:00,Asia/Manila,ep40-ang-mga-arko,pending
+41,4,Ang Panunumpa,2026-12-04,Biy,19:00,Asia/Manila,ep41-ang-panunumpa,pending
+42,5,Ang Buwan na Parang Dugo,2026-12-04,Biy,23:00,Asia/Manila,ep42-ang-buwan-na-parang-dugo,pending
+43,5,Ang Tambuli,2026-12-05,Sab,19:00,Asia/Manila,ep43-ang-tambuli,pending
+44,5,Ang Look ng Maynila,2026-12-05,Sab,23:00,Asia/Manila,ep44-ang-look-ng-maynila,pending
+45,5,Mula Mactan hanggang Sulu,2026-12-06,Lin,19:00,Asia/Manila,ep45-mula-mactan-hanggang-sulu,pending
+46,5,Ang Mga Pinili,2026-12-06,Lin,23:00,Asia/Manila,ep46-ang-mga-pinili,pending
+47,5,Ang Gabing Ligtas ang Lahat,2026-12-07,Lun,19:00,Asia/Manila,ep47-ang-gabing-ligtas-ang-lahat,pending
+48,5,Ang Saksi,2026-12-07,Lun,23:00,Asia/Manila,ep48-ang-saksi,pending
+49,5,Ang Ikatlong Hiling,2026-12-08,Mar,19:00,Asia/Manila,ep49-ang-ikatlong-hiling,pending
+50,5,Ang Dulo,2026-12-08,Mar,23:00,Asia/Manila,ep50-ang-dulo,pending
