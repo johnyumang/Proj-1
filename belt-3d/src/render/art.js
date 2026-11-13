@@ -12,7 +12,7 @@ const WIDE = { w: 1600, h: 1000, cx: 800, cy: 470, tall: false };
 const TALL = { w: 800, h: 1300, cx: 400, cy: 400, tall: true };
 
 const svg = (V, body, cls = '') =>
-  `<svg class="art art--${V.tall ? 'tall' : 'wide'}${cls ? ` ${cls}` : ''}" viewBox="0 0 ${V.w} ${V.h}" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">${body}</svg>`;
+  `<svg class="art-svg art-svg--${V.tall ? 'tall' : 'wide'}${cls ? ` ${cls}` : ''}" viewBox="0 0 ${V.w} ${V.h}" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">${body}</svg>`;
 
 const rect = (x, y, w, h, fill, extra = '') => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}"${extra}/>`;
 const path = (d, fill, extra = '') => `<path d="${d}" fill="${fill}"${extra}/>`;
@@ -207,7 +207,7 @@ const CASUAL = {
     const { tall } = V;
     let s = '';
     // café table seen at an angle, two cups with saucers, a chair back
-    const [tx, ty, tr] = tall ? [610, 640, 170] : [270, 790, 230];
+    const [tx, ty, tr] = tall ? [610, 640, 170] : [1240, 800, 220];
     s += ellipse(tx + 30, ty + 40, tr, tr * 0.32, '#8f5a36', ' opacity="0.35"');
     s += rect(tx - 12, ty, 24, tall ? 160 : 210, '#5b3a24');
     s += ellipse(tx, ty, tr, tr * 0.3, '#c4663b');
@@ -220,12 +220,6 @@ const CASUAL = {
       s += path(`M${cx + 24} ${cy - 32}c18 0 18 22 0 22`, 'none', ' stroke="#fbf7ef" stroke-width="7"');
       s += ellipse(cx, cy - 40, 26, 6, '#7b4a2c');
       s += amb('steam', path(`M${cx - 6} ${cy - 56}c-14 -20 14 -30 0 -54`, 'none', ' stroke="#fbf7ef" stroke-width="5" stroke-linecap="round" opacity="0.8"'));
-    }
-    if (!tall) {
-      // chair back on the right
-      s += path('M1260 640h40v330h-40zM1440 640h40v330h-40z', '#7b4a2c');
-      s += rect(1250, 620, 240, 34, '#9a5a35', ' rx="16"');
-      s += rect(1250, 690, 240, 22, '#9a5a35', ' rx="11"');
     }
     return svg(V, s);
   },

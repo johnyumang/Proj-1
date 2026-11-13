@@ -26,12 +26,9 @@ export const ui3d = {
   viewIn: 'View this page in',
 
   // Shop block
-  colour: 'Colour',
+  colour: 'Color',
   packs: 'Pack',
-  pricePending: 'Preview: price to be set',
-  addOn: 'Add-on',
   selected: 'Selected:',
-  care: 'Care',
 };
 
 export default ui3d;

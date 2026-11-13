@@ -294,7 +294,8 @@ export function createStory({ stub = false } = {}) {
     lastTime.t = time;
     const y = window.scrollY;
     const H = window.innerHeight;
-    // paper sections fully cover the stage: nothing to draw
+    // paper sections cover the stage: hide the rail, and draw nothing while they cover it fully
+    root.classList.toggle('is-paper', y + H * 0.5 >= dom.cover.top && y + H * 0.5 <= dom.cover.bottom);
     if (y >= dom.cover.top && y + H <= dom.cover.bottom) return;
     const state = compose(time);
     if (stage) {

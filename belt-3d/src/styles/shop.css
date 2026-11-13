@@ -2,10 +2,6 @@
 .shop { position: relative; z-index: 1; background: var(--paper); color: var(--ink); overflow: clip; --acc: #8f3f22; --acc-ink: #fff; }
 .shop__ribbon { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
 .shop__ribbon svg { width: 100%; height: 100%; }
-.shop__ribbon path, .lib__ribbon path, .blog__ribbon path {
-  fill: none; stroke: var(--bronze); stroke-width: 28; vector-effect: non-scaling-stroke; opacity: 0.55;
-  stroke-dasharray: var(--draw, 1) 2;
-}
 .shop__sec { position: relative; z-index: 1; padding: clamp(56px, 9vw, 120px) var(--gutter); max-width: 1320px; margin: 0 auto; }
 .shop__head { display: grid; gap: 12px; max-width: 780px; margin-bottom: 40px; }
 .shop__title { font-family: var(--font-display); font-weight: 400; text-transform: uppercase; font-size: clamp(3rem, 1.8rem + 5vw, 6.5rem); line-height: 0.88; letter-spacing: -0.005em; }

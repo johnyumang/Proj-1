@@ -208,3 +208,58 @@ GSAP 3 (ScrollTrigger, SplitText) under GreenSock's standard no-charge licence. 
 Cormorant Garamond via `@fontsource`, SIL Open Font License, self-hosted. Photos and logo are
 SIIL's own, downloaded from siilostomy.com for this preview. The cut-outs were made locally
 with rembg and the BiRefNet matting model (both MIT licensed); neither is shipped with the page.
+
+## 3D scroll story (belt-3d/)
+
+A second, separate page: an illustrated scroll story around a real-time 3D model of the belt
+(WebGL, `belt-3d/src/scene/`), plus a library page. Same rules as the main page: concept
+preview, `noindex,nofollow`, every customer-facing word from `src/content/belt.en.js`.
+
+```bash
+npm run dev:3d        # dev server (add ?stub=1 for a 2D debug stand-in of the scene, ?plain=1 for the plain page)
+npm run build:3d      # static site in dist-3d/ (index.html + blog.html)
+npm run preview:3d    # serves dist-3d/ at http://localhost:4174
+```
+
+Story order and scroll lengths (one viewport = 100 vh): gate 220 vh (look down through the ring,
+push in), POOL 280, BEACH 280, CASUAL 280, OFFICE 300 (four lifestyle scenes, chapters 01–04),
+HIGHLIGHTS 400 (pocket, VELCRO closure peeling open and shut, fabric), ACCESS 300 (zip opens on
+the torso form), then the shop block and the library on paper (normal flow), CLOSE (ring seen
+from above, text on a disc in its hole, a card rising over it) and the footer. Every section
+after the gate begins when its top enters the viewport; its first viewport is the hand-over beat
+(belt turns once, colour blends, old scene parts, word swaps) while the previous text scrolls away.
+
+```
+belt-3d/
+  index.html, blog.html     shells; an inline head script picks story or plain before first paint
+  vite.config.js            transformIndexHtml plugin: renders src/render/* into both pages
+  src/content/              ui3d.en.js (interface labels), scenes.js (owner-dictated words),
+                            packs.js (pack labels and PROVISIONAL prices), listings.json, blog.en.json
+  src/render/               page.js (story), shop.js, blog.js, parts.js (bar, flags, cards, icons),
+                            art.js (the four scene illustrations and fold fields, wide and phone compositions)
+  src/story/                timelines.js (one ScrollTrigger + timeline per section), index.js (compose,
+                            ticker, hotspots, keyboard), ribbons.js, intro.js, debug-stage.js (?stub=1 only)
+  src/ui/                   lang.js (store language switcher), fx.js (magnetic buttons, card tilt)
+  src/styles/               tokens.css (all colours), base, sections (plain), story, shop, library, blog
+  src/scene/                the WebGL stage (separate owner; contract in its index.js)
+  public/media/             cut-out product photos for the plain page and the shop cards
+```
+
+How the state flows: each section's timeline tweens plain numbers on its own state object, which
+starts as a copy of the previous section's end state. `compose()` (src/story/index.js) takes the
+state of the latest section that has started, adds two additive layers (pointer parallax on
+desktop, the first-load intro) and produces the `StageState` for `stage.apply()` from one gsap
+ticker callback; the same state drives the scene art planes, giant words, SVG ribbons, hotspots,
+counters and progress (transform, opacity and custom properties only). Ticking stops while the
+tab is hidden and while the paper sections cover the stage. The story is rebuilt on width change
+and after the fonts load; the picture is a function of scroll position (checked: scroll to the
+end and back, reload mid-page, resize away and back give the same frame).
+
+Plain presentation (no JavaScript, reduced motion, no WebGL, short viewport, `?plain=1`, or the
+story failing to start within 4 s): stacked sections in the scene palettes with the art as a still
+backdrop, a cut-out product photo per scene, all text and final counter values. three.js is loaded
+only through the scene module, with a dynamic import after the text has painted.
+
+Provisional (listed in OPEN-QUESTIONS.md part C): the scene words and shop titles, pack prices and
+contents, the mesh wash bag and care guide labels, the German belt page, the typographic library
+cards, and the 3D model itself as a reconstruction to check against the product.

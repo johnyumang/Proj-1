@@ -15,16 +15,20 @@ import { gsap, ScrollTrigger, SplitText } from './gsap.js';
 const TAU = Math.PI * 2;
 export const GROUPS = ['gate', 'pool', 'beach', 'casual', 'office', 'hl', 'access', 'close'];
 const SCENE_COLOR = [1, 0, 0, 2]; // pool navy, beach beige, casual beige, office black
-/** spin phases for the highlights (0 = front panel to camera): pocket, fastening (side/back), fabric label */
-export const HL_SPIN = [0, 2.2, TAU - 0.5];
+/**
+ * spin phases for the highlights (0 = front panel to camera), from the scene's geometry:
+ * pocket at the front; VELCRO closure faces the camera at 2.2, its lifted hook tab reads best
+ * at about 1.55; the woven label (fabric) sits upper front on the wearer's left, about 0.52.
+ */
+export const HL_SPIN = { pocket: 0, closure: 2.2, peel: 1.55, label: 0.6 };
 export const ANCHORS = ['pocket', 'fastening', 'label'];
 
 /** Per layout: where the belt stands and how big it is. */
 export function layoutConstants(layout) {
   if (layout === 'compact') {
-    return { y: -0.2, z: 0.74, gateY: 0.06, gateZ: 0.95, hlX: 0, hlY: -0.18, hlZ: 0.92, acX: 0, acY: -0.24, acZ: 0.72, clY: -0.13, clZ: 1.45 };
+    return { y: -0.13, z: 0.62, gateY: 0.06, gateZ: 1.7, hlX: 0, hlY: -0.16, hlZ: 0.8, acX: 0, acY: -0.33, acZ: 0.46, clY: -0.2, clZ: 1.5 };
   }
-  return { y: -0.02, z: 1, gateY: 0.1, gateZ: 1, hlX: layout === 'mid' ? -0.16 : -0.13, hlY: 0.02, hlZ: 1.32, acX: layout === 'mid' ? -0.25 : -0.23, acY: 0.02, acZ: 1, clY: 0, clZ: layout === 'mid' ? 1.95 : 2.1 };
+  return { y: -0.02, z: 1, gateY: 0.1, gateZ: 2, hlX: layout === 'mid' ? -0.17 : -0.15, hlY: 0.07, hlZ: 0.95, acX: layout === 'mid' ? -0.25 : -0.23, acY: 0.02, acZ: 1, clY: 0, clZ: layout === 'mid' ? 1.95 : 2.1 };
 }
 
 function initialState(L) {
@@ -110,7 +114,7 @@ export function buildTimelines({ sections, L, scrub = 0.8, onUpdate }) {
         to({ color: SCENE_COLOR[k] }, beat * 0.25, beat * 0.5, 'sine.inOut');
         to({ acc: k }, beat * 0.3, beat * 0.4);
         to({ [`p${g - 1}`]: -1 }, 0, beat, 'power3.inOut');
-        to({ [`o${g - 1}`]: 0 }, beat * 0.75, beat * 0.25);
+        to({ [`o${g - 1}`]: 0 }, beat * 0.45, beat * 0.4, 'sine.in');
         set({ [`p${g}`]: 1 }, 0);
         to({ [`p${g}`]: 0 }, 0, beat, 'power3.inOut');
         to({ [`o${g}`]: 1 }, beat * 0.1, beat * 0.45, 'sine.inOut');
@@ -128,13 +132,13 @@ export function buildTimelines({ sections, L, scrub = 0.8, onUpdate }) {
       to({ tilt: k % 2 ? -0.05 : 0.05 }, beat, 1 - beat, 'sine.inOut');
       if (el.querySelector('[data-count]')) {
         set({ n7: 1, n140: 55 }, 0);
-        to({ n7: 7, n140: 140 }, beat + 0.06, 0.24, 'power2.out');
+        to({ n7: 7, n140: 140 }, beat + 0.04, 0.14, 'power2.out');
       }
       textIn(beat + 0.02);
     } else if (kind === 'highlights') {
       const g = 5;
       const beat = h;
-      const base = forwardTo(s.spin, HL_SPIN[0], 1.4);
+      const base = forwardTo(s.spin, HL_SPIN.pocket, 1.4);
       to({ [`p4`]: -1 }, 0, beat, 'power3.inOut');
       to({ o4: 0 }, beat * 0.75, beat * 0.25);
       set({ [`p${g}`]: 1 }, 0);
@@ -149,19 +153,20 @@ export function buildTimelines({ sections, L, scrub = 0.8, onUpdate }) {
       to({ x: L.hlX, y: L.hlY, zoom: L.hlZ, tilt: 0 }, 0, beat, 'power3.inOut');
       to({ drift: 0.4 }, 0, beat);
       textIn(beat);
-      // three parts: pocket → fastening (VELCRO tab peels open and shut) → fabric
+      // three parts: pocket → fastening (closure, then the VELCRO tab peels open and presses shut) → fabric
       const seg = (1 - beat) / 3;
       const t1 = beat + seg;
       const t2 = beat + seg * 2;
       to({ hl: 1 }, beat + 0.02, 0.05);
-      to({ spin: base + 0.25 }, beat, seg * 0.9, 'sine.inOut');
-      to({ spin: base - HL_SPIN[0] + HL_SPIN[1] }, t1, seg * 0.35, 'power2.inOut');
-      to({ hlk: 1 }, t1, seg * 0.25, 'power2.inOut');
-      to({ peel: 1 }, t1 + seg * 0.35, seg * 0.2, 'power2.out');
-      to({ peel: 0 }, t1 + seg * 0.7, seg * 0.2, 'power2.in');
-      to({ spin: base - HL_SPIN[0] + HL_SPIN[2] }, t2, seg * 0.35, 'power2.inOut');
-      to({ hlk: 2 }, t2, seg * 0.25, 'power2.inOut');
-      to({ spin: base - HL_SPIN[0] + HL_SPIN[2] + 0.25 }, t2 + seg * 0.35, seg * 0.6, 'sine.inOut');
+      to({ spin: base + 0.2 }, beat, seg * 0.9, 'sine.inOut');
+      to({ spin: base + HL_SPIN.closure }, t1, seg * 0.3, 'power2.inOut');
+      to({ hlk: 1 }, t1, seg * 0.22, 'power2.inOut');
+      to({ spin: base + HL_SPIN.peel }, t1 + seg * 0.38, seg * 0.24, 'power2.inOut');
+      to({ peel: 1 }, t1 + seg * 0.38, seg * 0.24, 'power2.out');
+      to({ peel: 0 }, t1 + seg * 0.76, seg * 0.16, 'power2.in');
+      to({ spin: base + HL_SPIN.label }, t2, seg * 0.32, 'power2.inOut');
+      to({ hlk: 2 }, t2, seg * 0.22, 'power2.inOut');
+      to({ spin: base + HL_SPIN.label - 0.2 }, t2 + seg * 0.32, seg * 0.6, 'sine.inOut');
       to({ hl: 0 }, 0.95, 0.05);
     } else if (kind === 'access') {
       const g = 6;

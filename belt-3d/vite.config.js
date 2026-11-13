@@ -79,6 +79,8 @@ export default defineConfig({
     outDir: path.join(repo, 'dist-3d'),
     emptyOutDir: true,
     assetsInlineLimit: 0,
+    // the scene chunk (three.js) is ~580 kB and loads behind a dynamic import, after the text
+    chunkSizeWarningLimit: 700,
     rollupOptions: {
       input: {
         index: path.join(here, 'index.html'),

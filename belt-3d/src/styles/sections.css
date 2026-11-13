@@ -8,11 +8,11 @@
 .layer.field { position: absolute; inset: 0; z-index: -3; background: var(--field); }
 .art { position: absolute; inset: 0; z-index: -2; overflow: hidden; pointer-events: none; }
 .plane { position: absolute; inset: 0; }
-.art svg { width: 100%; height: 100%; }
-.art--tall { display: none; }
+.art-svg { width: 100%; height: 100%; }
+.art-svg--tall { display: none; }
 @media (max-width: 899px) {
-  .art--wide { display: none; }
-  .art--tall { display: block; }
+  .art-svg--wide { display: none; }
+  .art-svg--tall { display: block; }
 }
 .ribbon, .belt, .rail, .intro, .buybar, .hs__dot, .hs__line { display: none; }
 

@@ -59,3 +59,19 @@ Intro line: "Click a point to see it in action"
 2. **Velcro** — "Your fit. All day long." — "Firmer when you’re on the move, softer after a meal or when you rest. The VELCRO® closure adjusts in a second, right where you want it. And your pouch lies flat, so it doesn’t show under jeans, a blouse or a fitted dress."
 3. **Opening** — "Opens wide. Springs back." — "The elastic opening stretches up to 3 times its size, so any flange and your hand slip through with ease. Then it springs back and hugs your pouch. Made to prevent leaks."
 4. **Fabric** — "So light you’ll forget it’s there." — "An organic polyamide fabric, never polyester, that absorbs moisture and weighs next to nothing. Designed only for people with an ostomy, and only at SIIL Ostomy."
+
+## C. 3D scroll story (belt-3d/)
+
+Points the 3D story page (`belt-3d/`, see README) needed and could not take from the verified content.
+
+| # | Point | What the page does now | Decision needed |
+|---|---|---|---|
+| 1 | Scene words POOL, BEACH, CASUAL, OFFICE, the shop titles "Always unisex", "For women", "For men", "Unisex", and the library heading "Ostomy life & care library" (the live blog's category name) were dictated by the owner, not taken from the product copy. | Kept in `belt-3d/src/content/scenes.js`, marked as owner-dictated. | Confirm the wording. |
+| 2 | Pack prices are **provisional**: Multi-pack (2 belts) $145.99, Triple pack (3 belts) $209.99, mesh wash bag add-on + $6.00. Only Single $76.99 is verified (`content.meta.price`). Pack contents beyond "1 / 2 / 3 belts", and how buyers pick colours per belt, are unknown. | Shown as plain prices with the computed total, no savings or badges. All buy buttons of the pack selector go to the current language's unisex listing. Data in `belt-3d/src/content/packs.js`. | Real prices, pack names and contents, and a product/variation URL per pack. |
+| 3 | "Mesh wash bag" and "Care guide included" are owner-dictated labels with no product copy behind them. | Label only, no claim about the bag; the bag is our own flat drawing. | Approved wording, and whether the care guide is a printed insert, a PDF or a page. |
+| 4 | No verified translations of the story copy exist. | The store switcher (US, UK, Spain, Germany, France) changes only the store links and listing names (real per-language names from `listings.json`) and offers "View this page in …"; every story text stays English. | Translated copy per language, if the page should be localised. |
+| 5 | The German store has no belt landing page in the pages API. | "View this page in Deutsch" and German buy buttons point at the German unisex product page. | The German belt page URL, when it exists. |
+| 6 | Library cards are typographic, without the articles' photos, because the people in those photos have the status questioned in A12. | Number, category, date, title, excerpt; titles and excerpts verbatim from the live blog (captured 2026-11-13). | Whether article photos may be shown. |
+| 7 | The 3D belt is a stylised reconstruction (`belt-3d/src/scene/`), not a scan. | Used as the product picture in the story; the plain presentation shows the real cut-out product photos. | Check shape, closure, zip, label and colours against the product. |
+| 8 | Highlights chapter heading uses the specifications eyebrow and headline ("Specifications", "The ostomy belt at a glance") because no copy exists for a highlights section. | As stated. | Confirm or supply a heading. |
+| 9 | Access chapter: the zip is marked with the access chip "Reinforced YKK zip" (no hotspot text for the zip exists in the content). | Label only, on desktop. | Confirm. |

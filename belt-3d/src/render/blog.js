@@ -4,8 +4,8 @@
  */
 import { html, ext, icons, topBar, footer, postCard } from './parts.js';
 
-/** Size rhythm of the contents page: one lead, then wide / std / std / tall … */
-const RHYTHM = ['lead', 'std', 'std', 'wide', 'std', 'tall', 'std', 'wide', 'std', 'std', 'std', 'wide'];
+/** Size rhythm of the contents page: one lead with two beside it, a row of three, two halves, three, one full. */
+const RHYTHM = ['lead', 'std', 'std', 'std', 'std', 'std', 'half', 'half', 'std', 'std', 'std', 'full'];
 
 export function renderBlog({ content, brief, ui3d, library, listings, posts }) {
   return html`
